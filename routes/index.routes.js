@@ -7,6 +7,6 @@ router.get("/", (req, res, next) => {
 
 router.get('/game', (req, res) => {
   res.render('game');
-});
+}); 
 
 module.exports = router;
