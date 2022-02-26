@@ -10,3 +10,9 @@ a {
 h1 {
   color: 15px;
 }
+
+#game-canvas {
+  border: solid 5px red;
+  width: 1000px;
+  height: 600px;
+}
