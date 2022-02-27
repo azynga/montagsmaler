@@ -1,12 +1,39 @@
 body {
+  margin: 0;
   padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 a {
-  color: #00b7ff;
+  text-decoration: none;
+  color: white;
 }
 
 h1 {
   color: 15px;
 }
+
+nav {
+  display: flex;
+  flex-direction: row;
+  justify-content:space-around;
+  width: 100%;
+  background-color: black;
+}
+
+#container {
+  display: flex;
+  flex-direction: column;
+}
+form{
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+ button {
+   border-radius: 2px;
+   background-color: black;
+   color: white;
+   width: 10vw;
+ }

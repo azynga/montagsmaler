@@ -1,3 +1,6 @@
 const { Schema, model } = require('mongoose');
 
-module.exports = DrawCanvas;
+const canvasSchema = new Schema({
+
+})
+// module.exports = ;
