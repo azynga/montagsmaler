@@ -25,6 +25,7 @@ nav {
   display: flex;
   flex-direction: column;
 }
+
 form{
   display: flex;
   flex-direction: column;
@@ -37,3 +38,7 @@ form{
    color: white;
    width: 10vw;
  }
+
+#game-canvas {
+  border: solid 5px red;
+}
