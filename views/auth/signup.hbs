@@ -1,0 +1,23 @@
+<h1>Register</h1>
+
+<div id="container">
+    <form action="/auth/signup" method="post">
+    <label>
+        Username:
+        <input type="text" name="username" required>
+    </label>
+    <label>
+        Password:
+    <input type="password" name="password"  min="6" required>
+    </label>
+    <label>
+        Email:
+        <input type="email" name="email" required>
+    </label>
+    <button type="submit">Create account</button>
+    </form>
+</div>
+    <p>Already have an account?
+        
+    <a href="/auth/login" style="color:black">Click here to log in</a>
+    </p>
