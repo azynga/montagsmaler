@@ -9,8 +9,4 @@ if(req.session){
   // res.send(req.session)
 });
 
-router.get('/game', (req, res) => {
-  res.render('game');
-}); 
-
 module.exports = router;
