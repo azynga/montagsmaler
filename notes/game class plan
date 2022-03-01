@@ -1,0 +1,15 @@
+
+properties:
+    game id
+    playerslist -> list of player ids
+    current word
+    timer
+    round count
+    playerdrawing -> index number
+
+methods:
+    getWord
+    resetTimer
+    resetCanvas -> send a message to browser to clear the clear
+    nextRound -> increase playerdrawing index, resetCanvas, resetTimer
+    startGame
