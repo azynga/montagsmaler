@@ -1,6 +1,9 @@
 <h1>Sign in</h1>
 
 <div id="container">
+    {{#if errorMessage}}
+    <p>{{errorMessage}}</p>
+    {{/if}}
     <form action="/auth/login" method="post">
     <label>
         Username:
