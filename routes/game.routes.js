@@ -1,12 +1,22 @@
 const router = require('express').Router();
 
+const { Game, gameList } = require('../game/game');
+
 const drawingData = {};
 
 router.get('/matchlist', (req, res) => {
     res.render('game/matchlist');
 });
 
+router.get('/create', (req, res) => {
+    const userId = req.session.currentUser['_id'];
+    const game = new Game(userId);
+    gameList.push(game);
+};
+
 router.get('/:gameId', (req, res) => {
+    const gameId = req.params.gameId;
+    // gameList[gameId].resetRound();
     res.render('game');
 });
 
