@@ -13,7 +13,7 @@ const isLoggedIn = (req, res, next) =>{
     } else {
 
       if(route === '/signup' || route === '/login') {
-        res.redirect('/auth/myaccount')
+        res.redirect('/user/myaccount');
       } else {
         next();
       };
