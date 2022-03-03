@@ -8,8 +8,8 @@ properties:
     playerdrawing -> index number
 
 methods:
-    getWord
+    getWord -> axios request to wordsAPI
     resetTimer
     resetCanvas -> send a message to browser to clear the clear
-    nextRound -> increase playerdrawing index, resetCanvas, resetTimer
+    nextRound -> increase playerdrawing index, resetCanvas, resetTimer, getWord
     startGame
