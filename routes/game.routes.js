@@ -1,39 +1,49 @@
 const router = require('express').Router();
 
-const { Game, gameList } = require('../game/game');
+const { allGames, Game } = require('../game/game');
+const User = require('../models/User.model');
 
-const drawingData = {};
-
-router.get('/matchlist', (req, res) => {
+router.get('/list', (req, res) => {
     res.render('game/matchlist');
 });
 
 router.get('/create', (req, res) => {
     const userId = req.session.currentUser['_id'];
-    const game = new Game(userId);
-    gameList.push(game);
-};
+    const game = new Game();
+    game.addPlayer(userId);
+    allGames[game.gameId] = game;
+    res.redirect('/game/:gameId');
+});
 
 router.get('/:gameId', (req, res) => {
-    const gameId = req.params.gameId;
-    // gameList[gameId].resetRound();
-    res.render('game');
+    const { gameId } = req.params;
+    const game = allGames.find((game) => game.gameId === gameId);
+    const playerNames = game.players.map(player => {
+        User.findById(player.userId)
+            .then(playerName => playerName)
+            .catch(error => console.error(error));
+    });
+    res.render('game/game', { players });
 });
 
 router.get('/:gameId/data', (req, res) => {
+    const { gameId } = req.params;
+    const drawingData = allGames[gameId].currentDrawingData;
     res.send(drawingData);
 });
 
-router.get(':gameId/lobby', (req, res) => {
-    const { currentUser } = req.session;
-    const { gameId } = req.params;
-    const players = gameList[gameId].players;
+// router.get(':gameId/lobby', (req, res) => {
+//     const { currentUser } = req.session;
+//     const { gameId } = req.params;
+//     const players = gameList[gameId].players;
 
-    gameList[gameId].players.push(currentUser);
-    res.render('games/lobby', { players });
-});
+//     gameList[gameId].players.push(currentUser);
+//     res.render('games/lobby', { players });
+// });
 
 router.post('/:gameId/data', (req, res) => {
+    const { gameId } = req.params;
+    const drawingData = allGames[gameId].currentDrawingData;
     drawingData.lines = req.body.lines;
     res.end();
 });

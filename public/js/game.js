@@ -5,16 +5,6 @@ const ctx = canvas.getContext('2d');
 canvas.width = 1000;
 canvas.height = 600;
 
-// class Game {
-//     constructor(players) {
-//         this.gameId = Date.now().toString(36);
-//         this.players = players;
-//         this.isDrawing = false;
-//     };
-// }
-
-
-
 
 let isDrawing = false;
 let isPlayersDrawingRound = true;
