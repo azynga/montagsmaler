@@ -20,14 +20,16 @@ router.get('/login', isLoggedIn, (req, res, next) => {
     res.render('auth/login')
 });
 
-router.get('/myaccount', isLoggedIn, (req, res, next) => {
-    res.render('auth/my-account')
-});
+
 
 router.get('/logout', isLoggedIn, (req, res, next) => {
+    const { currentUser } = req.session.currentUser
     req.session.destroy();
+    // setTimeout(() => {
+    //     window.location.replace('http://localhost:3000/')
+    // },5000)
     // res.write('Redirecting to home in 5 seconds...');
-    setTimeout(() => res.redirect('/'), 5000)
+    res.render('auth/logout', { currentUser });
 });
 
 // Post Routes

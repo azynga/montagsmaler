@@ -1,10 +1,19 @@
+// External imports
 const router = require('express').Router();
 
 const { allGames, Game } = require('../game/game');
 const User = require('../models/User.model');
 
-router.get('/list', (req, res) => {
-    res.render('game/matchlist');
+// Internal imports
+const { isLoggedIn } = require('../middleware/route-guard.js');
+
+router.get('/matchlist', isLoggedIn, (req, res, next) => {
+    if(req.session){
+        const {currentUser} = req.session
+        res.render('game/matchlist', { currentUser });
+        // console.log(req.session.currentUser)
+      }
+    // res.render('game/matchlist');
 });
 
 router.get('/create', (req, res) => {
@@ -16,6 +25,7 @@ router.get('/create', (req, res) => {
 });
 
 router.get('/:gameId', (req, res) => {
+    const {currentUser} = req.session;
     const { gameId } = req.params;
     const game = allGames.find((game) => game.gameId === gameId);
     const playerNames = game.players.map(player => {
@@ -23,7 +33,7 @@ router.get('/:gameId', (req, res) => {
             .then(playerName => playerName)
             .catch(error => console.error(error));
     });
-    res.render('game/game', { players });
+    res.render('game/game', { players, currentUser });
 });
 
 router.get('/:gameId/data', (req, res) => {
@@ -36,10 +46,13 @@ router.get('/:gameId/data', (req, res) => {
 //     const { currentUser } = req.session;
 //     const { gameId } = req.params;
 //     const players = gameList[gameId].players;
-
 //     gameList[gameId].players.push(currentUser);
 //     res.render('games/lobby', { players });
 // });
+
+    gameList[gameId].players.push(currentUser);
+    res.render('games/lobby', { currentUser, players });
+});
 
 router.post('/:gameId/data', (req, res) => {
     const { gameId } = req.params;
