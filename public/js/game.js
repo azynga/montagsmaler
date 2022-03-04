@@ -2,46 +2,50 @@
 const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
 
+const playerList = document.getElementById('player-list');
+
 canvas.width = 1000;
 canvas.height = 600;
 
-
-let isDrawing = false;
 let isPlayersDrawingRound = true;
+let isDrawing = false;
 let currentLineIndex = 0;
+let currentPlayers = [];
 
 const drawingData = {
     lines: []
 }; 
 
 canvas.addEventListener('mousedown', (event) => {
-    isDrawing = true;
-
-    // Line styles
-    ctx.strokeStyle = 'blue';
-    ctx.lineWidth = 10;
-    ctx.lineJoin = 'round';
-    ctx.lineCap = 'round';
+    if(isPlayersDrawingRound) {
+        isDrawing = true;
     
-    // Add start a new line in drawingData
-    const newLine = {
-        color: ctx.strokeStyle,
-        width: ctx.lineWidth,
-        points: [
-            {
-                x: event.offsetX,
-                y: event.offsetY
-            }
-        ]
-    };
-
-    drawingData.lines.push(newLine);
-
-    // Rendering start point
-    ctx.beginPath();
-    ctx.moveTo(event.offsetX, event.offsetY);
-    ctx.lineTo(event.offsetX, event.offsetY);
-    ctx.stroke();
+        // Line styles
+        ctx.strokeStyle = 'blue';
+        ctx.lineWidth = 10;
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        
+        // Add start a new line in drawingData
+        const newLine = {
+            color: ctx.strokeStyle,
+            width: ctx.lineWidth,
+            points: [
+                {
+                    x: event.offsetX,
+                    y: event.offsetY
+                }
+            ]
+        };
+    
+        drawingData.lines.push(newLine);
+    
+        // Rendering start point
+        ctx.beginPath();
+        ctx.moveTo(event.offsetX, event.offsetY);
+        ctx.lineTo(event.offsetX, event.offsetY);
+        ctx.stroke();
+    }
 });
 
 canvas.addEventListener('mouseup', () => {
@@ -52,7 +56,7 @@ canvas.addEventListener('mouseup', () => {
 });
 
 canvas.addEventListener('mousemove', (event) => {
-    if(isDrawing) {
+    if(isPlayersDrawingRound && isDrawing) {
         const currentLinePoints = drawingData.lines[currentLineIndex].points;
 
         // Add mouse coordinates to current line
@@ -78,7 +82,8 @@ const drawPath = (points) => {
     ctx.stroke();
 };
 
-const drawImageFromData = (lines) => {
+const drawImageFromData = (drawingData) => {
+    const { lines } = drawingData;
     lines.forEach(line => {
         ctx.strokeStyle = 'blue';
         ctx.lineWidth = 10;
@@ -89,34 +94,47 @@ const drawImageFromData = (lines) => {
     })
 };
 
+const updatePlayerList = (response) => {
+    const { players } = response.data;
+    const playersChanged = JSON.stringify(currentPlayers) !== JSON.stringify(players);
+
+    if(playersChanged) {
+        currentPlayers = players;
+        playerList.textContent = '';
+        currentPlayers.forEach(player => {
+            const newPlayer = document.createElement('li');
+            newPlayer.textContent = `${player.username} – ${player.points} Points`;
+            playerList.appendChild(newPlayer);
+        });
+    };
+};
+
 const updateInterval = setInterval(() => {
 
-    if(isPlayersDrawingRound && isDrawing) {
-        axios.post('/game/data', drawingData)
-            .then(sentDrawingData => {
-                
+    if(isPlayersDrawingRound) {
+        axios.post(window.location.pathname + '/data', drawingData)
+            .then(response => {
+                isPlayersDrawingRound = response.data.isPlayerDrawing;
+                updatePlayerList(response);
             })
             .catch(error => {
                 console.error(error);
             });
+
     } else {
-        axios.get('/game/data')
-            .then(requestedDrawingData => {
-                const { lines } = requestedDrawingData.data;
-                // console.log(lines);
-                drawImageFromData(lines);
+
+        axios.get(window.location.pathname + '/data')
+            .then(response => {
+                isPlayersDrawingRound = response.data.isPlayerDrawing;
+                updatePlayerList(response);
+                const { drawingData } = response.data;
+                canvas.width = canvas.width;
+                drawImageFromData(drawingData);
             })
             .catch(error => {
                 console.error(error);
             });
-    }
+
+    };
 
 }, 1000/5);
-
-document.getElementById('drawing-button').addEventListener('click', () => {
-    isPlayersDrawingRound = true;
-});
-
-document.getElementById('not-drawing-button').addEventListener('click', () => {
-    isPlayersDrawingRound = false;
-});
