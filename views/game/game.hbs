@@ -1,9 +1,14 @@
 <h2>This is the game page</h2>
 
+<h3>Players: </h3>
 <ul id="player-list">
-    
+    {{!-- {{#each players}}
+        <li>{{username}}</li>
+    {{/each}} --}}
 </ul>
 <canvas id="game-canvas"></canvas>
+
+<a href="/game/{{gameId}}/leave">Leave the game</a>
 {{!-- <button id="drawing-button">Drawing</button>
 <button id="not-drawing-button">Not drawing</button> --}}
 
