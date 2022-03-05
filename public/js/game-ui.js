@@ -7,12 +7,13 @@ const playerList = document.getElementById('player-list');
 canvas.width = 1000;
 canvas.height = 600;
 
-let isPlayersDrawingRound = true;
+let isPlayersDrawingRound = false;
 let isDrawing = false;
 let currentLineIndex = 0;
 let currentPlayers = [];
+let currentWord = '';
 
-const drawingData = {
+const currentDrawingData = {
     lines: []
 }; 
 
@@ -38,7 +39,7 @@ canvas.addEventListener('mousedown', (event) => {
             ]
         };
     
-        drawingData.lines.push(newLine);
+        currentDrawingData.lines.push(newLine);
     
         // Rendering start point
         ctx.beginPath();
@@ -57,7 +58,7 @@ canvas.addEventListener('mouseup', () => {
 
 canvas.addEventListener('mousemove', (event) => {
     if(isPlayersDrawingRound && isDrawing) {
-        const currentLinePoints = drawingData.lines[currentLineIndex].points;
+        const currentLinePoints = currentDrawingData.lines[currentLineIndex].points;
 
         // Add mouse coordinates to current line
         currentLinePoints.push({
@@ -83,6 +84,7 @@ const drawPath = (points) => {
 };
 
 const drawImageFromData = (drawingData) => {
+    canvas.width = canvas.width;
     const { lines } = drawingData;
     lines.forEach(line => {
         ctx.strokeStyle = line.color;
@@ -91,11 +93,10 @@ const drawImageFromData = (drawingData) => {
         ctx.lineCap = 'round';
 
         drawPath(line.points);
-    })
+    });
 };
 
-const updatePlayerList = (response) => {
-    const { players } = response.data;
+const updatePlayerList = (players) => {
     const playersChanged = JSON.stringify(currentPlayers) !== JSON.stringify(players);
 
     if(playersChanged) {
@@ -110,32 +111,23 @@ const updatePlayerList = (response) => {
 };
 
 const updateInterval = setInterval(() => {
-    
-    if(isPlayersDrawingRound) {
-        
-        axios.post(window.location.pathname + '/data', drawingData)
-            .then(response => {
-                isPlayersDrawingRound = response.data.isPlayerDrawing;
-                updatePlayerList(response);
-            })
-            .catch(error => {
-                console.error(error);
-            });
+    requestUpdate()
+        .then(data => {
+            const { players, isPlayerDrawing, drawingData, word } = data;
 
-    } else {
-        
-        axios.get(window.location.pathname + '/data')
-            .then(response => {
-                isPlayersDrawingRound = response.data.isPlayerDrawing;
-                updatePlayerList(response);
-                const { drawingData } = response.data;
-                canvas.width = canvas.width;
+            updatePlayerList(players);
+            isPlayersDrawingRound = isPlayerDrawing;
+            currentWord = word;
+
+            if(!isPlayersDrawingRound) {
+                console.log(drawingData);
                 drawImageFromData(drawingData);
-            })
-            .catch(error => {
-                console.error(error);
-            });
+            };
+        })
+        .catch(error => console.error(error));
 
+    if(isPlayersDrawingRound) {
+        sendUpdate(currentDrawingData);
     };
 
 }, 1000/5);
