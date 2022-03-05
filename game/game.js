@@ -1,4 +1,6 @@
 
+const axios = require('axios');
+
 const User = require('../models/User.model');
 
 const allGames = {};
@@ -12,7 +14,7 @@ class Game {
         this.drawingPlayerIndex = 0;
         this.timer = null;
         this.activeRound = false;
-        this.nextWords = [];
+        this.nextWords = this.getFirstWords();
     }
 
     addPlayer(userId) {
@@ -34,15 +36,30 @@ class Game {
     }
 
     getRandomWord() {
-        return 'placeholder'
+        const alphabet = 'abcdefghijklmnopqrstuvwxyz';
+        const letterIndex = Math.floor(Math.random() * 26);
+        const randomLetter = alphabet[letterIndex];
+
+        return axios.get(`https://api.datamuse.com/words?sp=*${randomLetter}*&md=pf&max=1000`)
+            .then(response => {
+                const wordList = response.data;
+                const filteredWordList = wordList.filter(wordData => {
+                    const wordFrequency = Number(wordData.tags.find(item => item.startsWith('f:')).slice(2));
+                    return wordData.tags.includes('n') && wordFrequency > 10 && wordData.word.length > 2;
+                });
+                const wordIndex = Math.floor(Math.random() * filteredWordList.length);
+                const randomWord = filteredWordList[wordIndex];
+                return randomWord.word;
+            })
+            .catch(error => console.error(error));
     }
 
     getFirstWords() {
         const words = []
         for(let i = 0; i < 3; i ++) {
             this.getRandomWord()
-                .them(randomWord => {
-                    this.words.push(randomWord)
+                .then(randomWord => {
+                    words.push(randomWord);
                 })
                 .catch(error => console.error(error));
         };

@@ -21,7 +21,7 @@ canvas.addEventListener('mousedown', (event) => {
         isDrawing = true;
     
         // Line styles
-        ctx.strokeStyle = 'blue';
+        ctx.strokeStyle = 'hsla(180, 80%, 20%, 1)';
         ctx.lineWidth = 10;
         ctx.lineJoin = 'round';
         ctx.lineCap = 'round';
@@ -85,8 +85,8 @@ const drawPath = (points) => {
 const drawImageFromData = (drawingData) => {
     const { lines } = drawingData;
     lines.forEach(line => {
-        ctx.strokeStyle = 'blue';
-        ctx.lineWidth = 10;
+        ctx.strokeStyle = line.color;
+        ctx.lineWidth = line.width;
         ctx.lineJoin = 'round';
         ctx.lineCap = 'round';
 
@@ -110,8 +110,9 @@ const updatePlayerList = (response) => {
 };
 
 const updateInterval = setInterval(() => {
-
+    
     if(isPlayersDrawingRound) {
+        
         axios.post(window.location.pathname + '/data', drawingData)
             .then(response => {
                 isPlayersDrawingRound = response.data.isPlayerDrawing;
@@ -122,7 +123,7 @@ const updateInterval = setInterval(() => {
             });
 
     } else {
-
+        
         axios.get(window.location.pathname + '/data')
             .then(response => {
                 isPlayersDrawingRound = response.data.isPlayerDrawing;
