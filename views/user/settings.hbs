@@ -1,0 +1,30 @@
+<h1>Account details</h1>
+
+<div id="container">
+{{#if message}}
+<p>{{message}}</p>
+{{/if}}
+    <h3>Security:</h3>
+    <form action="/user/settings" method="post">
+        <div id="change">
+            <h4>Change your password</h4>
+            <label>
+                Old password:
+                <input type="password" name="oldPassword">
+            </label>
+            <label>
+                New password:
+                <input type="password" name="newPassword">
+            </label>
+        </div>
+        <div id="change">
+            <label>
+                Upload an avatar (.png, .jpg only):
+                <input type="file" name="avatar" id="avatar">
+                <img src="" alt="{{username}}' avatar" id="avatar_prev">
+            </label>
+        </div>
+        <button type="submit">Save changes</button>
+    </form>
+
+</div>

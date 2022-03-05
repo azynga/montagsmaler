@@ -6,17 +6,25 @@ const userSchema = new Schema(
       type: String,
       unique: true
     },
-    password: String,
-    email: {
+    password: {
       type: String,
-      format: 'email'
+      required: true
     },
     avatarUrl: String,
+    highlights: [{
+      type: String,
+      url: String,
+      word: String, // this should be the word the drawing relates to
+    }],
   },
   {
     timestamps: true,
   }
 );
+
+const highlightSchema = new Schema({
+
+})
 
 const User = model("User", userSchema);
 

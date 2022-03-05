@@ -10,7 +10,7 @@ const { isLoggedIn } = require('../middleware/route-guard.js');
 router.get('/matchlist', isLoggedIn, (req, res, next) => {
     if(req.session){
         const {currentUser} = req.session
-        res.render('game/matchlist', { currentUser });
+        res.render('game/list', { currentUser });
         // console.log(req.session.currentUser)
       }
     // res.render('game/matchlist');
@@ -49,10 +49,9 @@ router.get('/:gameId/data', (req, res) => {
 //     gameList[gameId].players.push(currentUser);
 //     res.render('games/lobby', { players });
 // });
-
-    gameList[gameId].players.push(currentUser);
-    res.render('games/lobby', { currentUser, players });
-});
+//     gameList[gameId].players.push(currentUser);
+//     res.render('games/lobby', { currentUser, players });
+// });
 
 router.post('/:gameId/data', (req, res) => {
     const { gameId } = req.params;
