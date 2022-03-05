@@ -24,8 +24,9 @@ const checkAnswer = (event) => {
     
     console.log('trigger')
     if(event.key === 'Enter'){
+        console.log(currentWord);
             const {value} = event.target;
-            if(word.toLowerCase() === value.toLowerCase()){
+            if(currentWord.toLowerCase() === value.toLowerCase()){
                 answerDiv.classList.add('right-answer');
             }
             else{

@@ -15,6 +15,7 @@ const requestUpdate = () => {
     return axios.get(window.location.pathname + '/data')
         .then(response => {
             const { isPlayerDrawing, drawingData, players, word } = response.data;
+            console.log(word);
             return {
                 players,
                 isPlayerDrawing,
