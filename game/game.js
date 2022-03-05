@@ -1,4 +1,6 @@
 
+const User = require('../models/User.model');
+
 const allGames = {};
 
 class Game {
@@ -14,14 +16,21 @@ class Game {
     }
 
     addPlayer(userId) {
-        this.players.push({
-            userId,
-            points: 0
-        });
+        const playerAlreadyInGame = this.players.some(player => player.userId === userId);
+        if(!playerAlreadyInGame) {
+            User.findById(userId)
+                .then(user => {
+                    this.players.push({
+                        username: user.username,
+                        userId,
+                        points: 0
+                    });
+                });
+        };
     }
 
     removePlayer(userId) {
-        delete this.players[userId];
+        this.players = this.players.filter(player => player.userId !== userId);
     }
 
     getRandomWord() {

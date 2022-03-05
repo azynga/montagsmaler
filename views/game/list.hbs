@@ -1,1 +1,14 @@
-<h1>Match list</h1>
+<h1>Game list</h1>
+
+<a href="/game/create" style="color: black">Create new game</a>
+
+<ul>
+    {{#each allGames}}
+        <li>
+            <h3>{{gameId}}</h3>
+            <p>Current players: {{players.length}}</p>
+            <a href="/game/{{gameId}}">Join Game</a>
+        </li>
+    {{/each}}
+</ul>
+

@@ -23,12 +23,9 @@ router.get('/login', isLoggedIn, (req, res, next) => {
 
 
 router.get('/logout', isLoggedIn, (req, res, next) => {
-    const { currentUser } = req.session.currentUser
+    const { currentUser } = req.session.currentUser;
+    console.log(currentUser)
     req.session.destroy();
-    // setTimeout(() => {
-    //     window.location.replace('http://localhost:3000/')
-    // },5000)
-    // res.write('Redirecting to home in 5 seconds...');
     res.render('auth/logout', { currentUser });
 });
 
