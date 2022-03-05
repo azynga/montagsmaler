@@ -30,11 +30,10 @@ router.post('/settings', (req, res, next) => {
   const {currentUser} = req.session;
   User.findOne({ username: currentUser.username })
     .then(user => {
-      console.log(user)
-      console.log(oldPassword, user.password);
+      // console.log(user)
+      // console.log(oldPassword, user.password);
       if(bcrypt.compare(oldPassword, user.password)){
         User.updateOne(
-          {username: user.username },
           {
             password: bcrypt.genSalt(saltRounds)
               .then(salt => bcrypt.hash(newPassword, salt))
