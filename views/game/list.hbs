@@ -1,14 +1,19 @@
 <h1>Game list</h1>
 
-<a href="/game/create" style="color: black">Create new game</a>
+<div id="container">
 
-<ul>
-    {{#each allGames}}
-        <li>
-            <h3>{{gameId}}</h3>
-            <p>Current players: {{players.length}}</p>
-            <a href="/game/{{gameId}}">Join Game</a>
-        </li>
-    {{/each}}
-</ul>
+    <a href="/game/create">Create new game</a>
 
+    <ul id="game-list">
+        {{#each allGames}}
+            <li class="game">
+                <a href="/game/{{gameId}}">
+                    <h3>Game Nr. {{@index}}</h3>
+                    <p>Current players: {{players.length}}</p>
+                    <p class="join">Join Game</p>
+                </a>
+            </li>
+        {{/each}}
+    </ul>
+
+</div>

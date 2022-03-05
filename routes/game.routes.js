@@ -19,7 +19,6 @@ router.get('/matchlist', isLoggedIn, (req, res, next) => {
 });
 
 router.get('/create', (req, res) => {
-    const userId = req.session.currentUser['_id'];
     const game = new Game();
     allGames[game.gameId] = game;
     res.redirect(`/game/${game.gameId}`);
@@ -30,7 +29,7 @@ router.get('/:gameId', (req, res) => {
     const { gameId } = req.params;
     
     if(!allGames[gameId]) {
-        res.send('This game ID does not exist.');
+        res.send('Woops! This game ID was not found. <a href="/game/matchlist">Back to list of games</a>');
         
     } else {
         const { currentUser } = req.session;
@@ -47,6 +46,9 @@ router.get('/:gameId/leave', (req, res) => {
     const userId = req.session.currentUser['_id'];
     const game = allGames[gameId];
     game.removePlayer(userId);
+    if(game.players.length <= 0) {
+        delete allGames[gameId];
+    }
     res.redirect('/game/matchlist');
 });
 
@@ -71,6 +73,7 @@ router.get('/:gameId/data', (req, res) => {
 
 
 router.post('/:gameId/data', (req, res) => {
+    
     const drawingData = req.body;
     const { gameId } = req.params;
     const userId = req.session.currentUser['_id'];
@@ -78,7 +81,8 @@ router.post('/:gameId/data', (req, res) => {
     game.currentDrawingData = drawingData;
     const players = game.players;
     const isPlayerDrawing = players[game.drawingPlayerIndex].userId === userId;
-
+    console.log(game.nextWords);
+    
     const data = {
         players,
         isPlayerDrawing
