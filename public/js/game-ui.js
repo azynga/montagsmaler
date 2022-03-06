@@ -15,7 +15,35 @@ let currentWord = '';
 
 const currentDrawingData = {
     lines: []
-}; 
+};
+
+const answerDiv = document.getElementById('answer');
+
+const checkAnswer = (event) => {
+
+    
+    // console.log('trigger')
+    if(event.key === 'Enter'){
+        // console.log(currentWord);
+            const {value} = event.target;
+            if(currentWord.toLowerCase() === value.toLowerCase()){
+                answerDiv.classList.add('right-answer');
+            }
+            else{
+                // console.log('oups')
+                answerDiv.classList.add('wrong-answer');
+                event.target.value = '';
+                setTimeout(() => {
+                    answerDiv.classList.remove('wrong-answer')
+                },3000);
+            };
+        }
+};
+
+
+
+answerDiv.addEventListener('keydown', checkAnswer)
+
 
 canvas.addEventListener('mousedown', (event) => {
     if(isPlayersDrawingRound) {
@@ -120,7 +148,7 @@ const updateInterval = setInterval(() => {
             currentWord = word;
 
             if(!isPlayersDrawingRound) {
-                console.log(drawingData);
+                // console.log(drawingData);
                 drawImageFromData(drawingData);
             };
         })

@@ -1,6 +1,6 @@
 // Authentication middleware
 const isLoggedIn = (req, res, next) =>{
-  console.log(req.session.currentUser)
+  // console.log(req.session.currentUser)
     const route = req.route.path;
     if(!req.session.currentUser){
 

@@ -59,8 +59,8 @@ router.get('/:gameId/data', (req, res) => {
     const players = game.players;
     const isPlayerDrawing = players[game.drawingPlayerIndex].userId === userId;
     const drawingData = allGames[gameId].currentDrawingData;
-    const word = game.nextWord[0];
-
+    const word = game.nextWords[0];
+    console.log(word);
     const data = {
         drawingData,
         players,
