@@ -1,8 +1,8 @@
 // const dataPackage = {};
 
-const sendUpdate = (drawingData) => {
+const sendUpdate = (drawingData, isMatch) => {
     
-    axios.post(window.location.pathname + '/data', drawingData)
+    axios.post(window.location.pathname + '/data', { drawingData, isMatch })
         .then(() => {
             console.log('Data was sent');
         })
