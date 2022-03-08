@@ -1,4 +1,6 @@
 const session = require('express-session');
+const MongoStore = require('connect-mongo');
+
 module.exports = app => {
     // <== app is just a placeholder here
     // but will become a real "app" in the app.js
@@ -18,7 +20,11 @@ module.exports = app => {
           secure: process.env.NODE_ENV === 'production',
           httpOnly: true,
           maxAge: 1000 * 60 * 60 * 24 // 60 * 1000 ms === 1 min
-        }
+        },
+        store: MongoStore.create({
+          mongoUrl: process.env.MONGODB_URI || 'mongodb://localhost/basic-auth',
+          ttl: 60 + 60 * 60 * 24
+        })
       })
-    );
-  };
+    )
+};

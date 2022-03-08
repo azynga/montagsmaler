@@ -18,11 +18,18 @@
             </label>
         </div>
         <div id="change">
-            <label>
+            <div class="dropdown"> Avatars:
+                <button class="dropdown-btn">
+                    {{#each avatarList}}
+                    avatar
+                    {{/each}}
+                </button>
+            </div>
+            {{!-- <label>
                 Upload an avatar (.png, .jpg only):
                 <input type="file" name="avatar" id="avatar">
                 <img src="" alt="{{username}}' avatar" id="avatar_prev">
-            </label>
+            </label> --}}
         </div>
         <button type="submit">Save changes</button>
     </form>
