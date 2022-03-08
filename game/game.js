@@ -67,8 +67,9 @@ class Game {
     }
 
     nextWord() {
+        this.currentDrawingData = {};
         this.nextWords.shift();
-        getRandomWord()
+        this.getRandomWord()
             .then(randomWord => this.nextWords.push(randomWord))
             .catch(error => console.error(error));
     }
@@ -86,9 +87,19 @@ class Game {
     endRound() {
         this.activeRound = false;
         clearInterval(this.timer);
-        const playerCount = this.playerDrawing.length;
-        this.playerDrawing = (this.playerDrawing + 1) % playerCount;
+        const playerCount = this.players.length;
+        this.drawingPlayerIndex = (this.drawingPlayerIndex + 1) % playerCount;
+    }
+
+    correctGuess(userId) {
+        const guessingPlayer = this.players.find(player => player.userId === userId);
+        const drawingPlayer = this.players[this.drawingPlayerIndex];
+
+        guessingPlayer.points += 1;
+        drawingPlayer.points += 1;
+
         this.currentDrawingData = {};
+        this.nextWord();
     }
 };
 

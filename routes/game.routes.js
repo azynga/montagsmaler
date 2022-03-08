@@ -60,7 +60,7 @@ router.get('/:gameId/data', (req, res) => {
     const isPlayerDrawing = players[game.drawingPlayerIndex].userId === userId;
     const drawingData = allGames[gameId].currentDrawingData;
     const word = game.nextWords[0];
-    console.log(word);
+    
     const data = {
         drawingData,
         players,
@@ -72,10 +72,19 @@ router.get('/:gameId/data', (req, res) => {
 });
 
 router.post('/:gameId/data', (req, res) => {
-    const drawingData = req.body;
+    const { drawingData, isMatch } = req.body;
     const { gameId } = req.params;
+    const userId = req.session.currentUser['_id'];
     const game = allGames[gameId];
-    game.currentDrawingData = drawingData;
+
+    if(drawingData) {
+        game.currentDrawingData = drawingData;
+    };
+
+    if(isMatch) {
+        game.correctGuess(userId);
+    };
+
     res.end();
 });
 
