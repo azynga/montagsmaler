@@ -1,26 +1,87 @@
-// Set up canvas
-const canvas = document.getElementById('game-canvas');
-const ctx = canvas.getContext('2d');
 
-const playerList = document.getElementById('player-list');
-const currentWordDisplay = document.getElementById('current-word');
 
-canvas.width = 1000;
-canvas.height = 600;
+class GameUi {
+    constructor() {
+        this.canvas = document.getElementById('game-canvas');
+        this.canvas.width = 800;
+        this.canvas.height = 800;
+        this.ctx = canvas.getContext('2d');
+        
+        this.answerInput = document.getElementById('answer');
 
-let isPlayersDrawingRound = false;
+        this.isPlayersDrawingRound = false;
+        this.currentPlayers = [];
+        this.currentWord = '';
+    }
+    
+    updatePlayerList(updatedPlayers) {
+        const playerListDisplay = document.getElementById('player-list');
 
-let isDrawing = false;
-let currentLineIndex = 0;
-let currentPlayers = [];
-let currentWord = '';
-let isMatch = false;
+        this.currentPlayers = updatedPlayers;
+        this.playerListDisplay.textContent = '';
+        this.currentPlayers.forEach(player => {
+            const newPlayer = document.createElement('li');
+            newPlayer.textContent = `${player.username} – ${player.points} Points`;
+            playerListDisplay.appendChild(newPlayer);
+        });
+    }
 
-const currentDrawingData = {
-    lines: []
-};
+    nextWord(updatedWord) {
+        this.currentWord = updatedWord;
+        currentDrawingData = {};
+    }
 
-const answerDiv = document.getElementById('answer');
+    receiveUpdates(data) {
+        const { updatedWord, updatedPlayers } = data;
+        const wordChanged = this.currentWord !== updatedWord;
+        const playersChanged = JSON.stringify(this.currentPlayers) !== JSON.stringify(updatedPlayers);
+        
+        if(wordChanged) {
+            this.nextWord(updatedWord);
+        };
+
+        if(playersChanged) {
+            this.updatePlayerList(updatedPlayers);
+        };
+    }
+
+    setUi() {
+        if(this.isPlayersDrawingRound) {
+            // hide answer input
+            // show word display
+            // show color selector
+        } else {
+            // show answer input
+            // hide word display
+            // hide color selector
+        }
+    }
+
+}
+
+
+
+// const canvas = document.getElementById('game-canvas');
+// const ctx = canvas.getContext('2d');
+
+// const playerList = document.getElementById('player-list');
+// const currentWordDisplay = document.getElementById('current-word');
+
+// canvas.width = 1000;
+// canvas.height = 600;
+
+// let isPlayersDrawingRound = false;
+
+// let isDrawing = false;
+// let currentLineIndex = 0;
+// let currentPlayers = [];
+// let currentWord = '';
+// let isMatch = false;
+
+// const currentDrawingData = {
+//     lines: []
+// };
+
 
 const checkAnswer = (event) => {
 
@@ -123,29 +184,29 @@ const drawImageFromData = (drawingData) => {
     });
 };
 
-const updatePlayerList = (players) => {
-    const playersChanged = JSON.stringify(currentPlayers) !== JSON.stringify(players);
+// const updatePlayerList = (players) => {
+//     const playersChanged = JSON.stringify(currentPlayers) !== JSON.stringify(players);
 
-    if(playersChanged) {
-        currentPlayers = players;
-        playerList.textContent = '';
-        currentPlayers.forEach(player => {
-            const newPlayer = document.createElement('li');
-            newPlayer.textContent = `${player.username} – ${player.points} Points`;
-            playerList.appendChild(newPlayer);
-        });
-    };
-};
+//     if(playersChanged) {
+//         currentPlayers = players;
+//         playerList.textContent = '';
+//         currentPlayers.forEach(player => {
+//             const newPlayer = document.createElement('li');
+//             newPlayer.textContent = `${player.username} – ${player.points} Points`;
+//             playerList.appendChild(newPlayer);
+//         });
+//     };
+// };
 
-const updateWord = (word) => {
-    wordChanged = currentWord !== word;
-    if(wordChanged) {
-        currentWord = word;
-        currentWordDisplay.textContent = currentWord;
-        currentDrawingData.lines = [];
-        isMatch = false;
-    }
-}
+// const updateWord = (word) => {
+//     wordChanged = currentWord !== word;
+//     if(wordChanged) {
+//         currentWord = word;
+//         currentWordDisplay.textContent = currentWord;
+//         currentDrawingData.lines = [];
+//         isMatch = false;
+//     }
+// }
 
 const updateInterval = setInterval(() => {
     // console.log(currentWord)

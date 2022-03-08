@@ -2,10 +2,11 @@
 <h3>Players: </h3>
 <ul id="player-list"></ul>
 <h4>Current Word: <span id="current-word"></span></h4>
+
 <canvas id="game-canvas"></canvas>
-<div>
-    <input type="text" name="answer" id="answer" placeholder="Type here...">
-</div>
+
+<input type="text" name="answer" id="answer" placeholder="Type here...">
+
 
 <a href="/game/{{gameId}}/leave">Leave the game</a>
 {{!-- <button id="drawing-button">Drawing</button>
@@ -14,3 +15,5 @@
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="/js/service.js"></script>
 <script src="/js/game-ui.js"></script>
+<script src="/js/guessing-ui.js"></script>
+<script src="/js/drawing-ui.js"></script>
