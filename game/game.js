@@ -67,6 +67,7 @@ class Game {
     }
 
     nextWord() {
+        this.currentDrawingData = {};
         this.nextWords.shift();
         getRandomWord()
             .then(randomWord => this.nextWords.push(randomWord))
@@ -86,9 +87,9 @@ class Game {
     endRound() {
         this.activeRound = false;
         clearInterval(this.timer);
-        const playerCount = this.playerDrawing.length;
-        this.playerDrawing = (this.playerDrawing + 1) % playerCount;
-        this.currentDrawingData = {};
+        const playerCount = this.players.length;
+        this.drawingPlayerIndex = (this.drawingPlayerIndex + 1) % playerCount;
+        
     }
 };
 

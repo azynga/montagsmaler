@@ -7,11 +7,12 @@ const playerList = document.getElementById('player-list');
 canvas.width = 1000;
 canvas.height = 600;
 
-let isPlayersDrawingRound = false;
-let isDrawing = false;
-let currentLineIndex = 0;
-let currentPlayers = [];
-let currentWord = '';
+let isPlayersDrawingRound = false; // both players
+
+let isDrawing = false; // drawing player
+let currentLineIndex = 0; // drawing player
+let currentPlayers = []; // both players
+let currentWord = ''; // both players
 
 const currentDrawingData = {
     lines: []
