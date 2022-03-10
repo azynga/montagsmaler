@@ -137,7 +137,7 @@ const updatePlayerList = (players) => {
 };
 
 const updateWord = (word) => {
-    wordChanged = currentWord !== word;
+    const wordChanged = currentWord !== word;
     if(wordChanged) {
         currentWord = word;
         currentWordDisplay.textContent = currentWord;
