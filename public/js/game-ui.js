@@ -10,17 +10,16 @@ canvas.height = 600;
 
 const socket = io();
 
-console.dir(socket)
+console.dir(socket);
 
 window.onclick = () => {
-    const number = 8;
-    socket.emit('hello', number);
-    console.log('emit hello');
+    socket.emit('hello');
+    console.log('hello emitted');
 };
 
-socket.on('say hello', (number, userId) => {
+socket.on('sayhello', (userId) => {
     console.log('received sayhello from server')
-    console.log(number + ' times hello from ' + userId);
+    console.log('hello from ' + userId);
 });
 
 let isPlayersDrawingRound = false;
