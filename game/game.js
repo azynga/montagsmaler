@@ -2,7 +2,7 @@
 const axios = require('axios');
 
 const User = require('../models/User.model');
-
+const connect = require('./connections');
 const allGames = {};
 
 class Game {
@@ -15,6 +15,7 @@ class Game {
         this.timer = null;
         this.activeRound = false;
         this.nextWords = this.getFirstWords();
+        this.connect = connect;
     }
 
     addPlayer(userId) {

@@ -8,6 +8,21 @@ const currentWordDisplay = document.getElementById('current-word');
 canvas.width = 1000;
 canvas.height = 600;
 
+const socket = io();
+
+console.dir(socket)
+
+window.onclick = () => {
+    const number = 8;
+    socket.emit('hello', number);
+    console.log('emit hello');
+};
+
+socket.on('say hello', (number, userId) => {
+    console.log('received sayhello from server')
+    console.log(number + ' times hello from ' + userId);
+});
+
 let isPlayersDrawingRound = false;
 
 let isDrawing = false;
@@ -147,29 +162,29 @@ const updateWord = (word) => {
     }
 }
 
-const updateInterval = setInterval(() => {
-    // console.log(currentWord)
-    requestUpdate()
-        .then(data => {
-            const { players, isPlayerDrawing, drawingData, word } = data;
+// const updateInterval = setInterval(() => {
+//     // console.log(currentWord)
+//     requestUpdate()
+//         .then(data => {
+//             const { players, isPlayerDrawing, drawingData, word } = data;
 
-            updatePlayerList(players);
-            updateWord(word);
+//             updatePlayerList(players);
+//             updateWord(word);
 
-            isPlayersDrawingRound = isPlayerDrawing;
+//             isPlayersDrawingRound = isPlayerDrawing;
 
-            if(!isPlayersDrawingRound) {
-                drawImageFromData(drawingData);
-            };
-        })
-        .catch(error => console.error(error));
+//             if(!isPlayersDrawingRound) {
+//                 drawImageFromData(drawingData);
+//             };
+//         })
+//         .catch(error => console.error(error));
     
     
 
-    if(isPlayersDrawingRound) {
-        sendUpdate(currentDrawingData);
-    } else {
-        sendUpdate(null, isMatch)
-    };
+//     if(isPlayersDrawingRound) {
+//         sendUpdate(currentDrawingData);
+//     } else {
+//         sendUpdate(null, isMatch)
+//     };
 
-}, 1000/5);
+// }, 1000/5);
