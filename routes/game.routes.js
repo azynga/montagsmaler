@@ -1,10 +1,9 @@
 // External imports
 const router = require('express').Router();
 
+// Internal imports
 const { allGames, Game } = require('../game/game');
 const User = require('../models/User.model');
-
-// Internal imports
 const { isLoggedIn } = require('../middleware/route-guard.js');
 
 router.get('/matchlist', isLoggedIn, (req, res, next) => {
