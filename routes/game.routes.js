@@ -1,10 +1,9 @@
 // External imports
 const router = require('express').Router();
 
+// Internal imports
 const { allGames, Game } = require('../game/game');
 const User = require('../models/User.model');
-
-// Internal imports
 const { isLoggedIn } = require('../middleware/route-guard.js');
 
 router.get('/matchlist', isLoggedIn, (req, res, next) => {
@@ -31,61 +30,10 @@ router.get('/:gameId', (req, res) => {
         const { currentUser } = req.session;
         const userId = currentUser['_id'];
         const game = allGames[gameId];
-        game.addPlayer(userId);
-        const players = game.players;
-        res.render('game/game', { players, currentUser, gameId });
+
+        game.connect(gameId, userId);
+        res.render('game/game', { currentUser, gameId });
     };
-});
-
-router.get('/:gameId/leave', (req, res) => {
-    const { gameId } = req.params;
-    const userId = req.session.currentUser['_id'];
-    const game = allGames[gameId];
-    game.removePlayer(userId);
-    if(game.players.length <= 0) {
-        delete allGames[gameId];
-    }
-    res.redirect('/game/matchlist');
-});
-
-
-router.get('/:gameId/data', (req, res) => {
-
-    const { gameId } = req.params;
-    const userId = req.session.currentUser['_id'];
-
-    const game = allGames[gameId];
-    
-    const players = game.players;
-    const isPlayerDrawing = players[game.drawingPlayerIndex].userId === userId;
-    const drawingData = allGames[gameId].currentDrawingData;
-    const word = game.nextWords[0];
-    
-    const data = {
-        drawingData,
-        players,
-        isPlayerDrawing,
-        word
-    };
-    
-    res.send(data);
-});
-
-router.post('/:gameId/data', (req, res) => {
-    const { drawingData, isMatch } = req.body;
-    const { gameId } = req.params;
-    const userId = req.session.currentUser['_id'];
-    const game = allGames[gameId];
-
-    if(drawingData) {
-        game.currentDrawingData = drawingData;
-    };
-
-    if(isMatch) {
-        game.correctGuess(userId);
-    };
-
-    res.end();
 });
 
 // router.post('/:gameId/drawing', (req, res) => {
