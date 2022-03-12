@@ -6,6 +6,7 @@ const { allGames, Game } = require('../game/game');
 const User = require('../models/User.model');
 const { isLoggedIn } = require('../middleware/route-guard.js');
 
+
 router.get('/matchlist', isLoggedIn, (req, res, next) => {
     if(req.session){
         const {currentUser} = req.session
@@ -25,13 +26,11 @@ router.get('/:gameId', (req, res) => {
     
     if(!allGames[gameId]) {
         res.send('Woops! This game ID was not found. <a href="/game/matchlist">Back to list of games</a>');
-        
     } else {
         const { currentUser } = req.session;
         const userId = currentUser['_id'];
         const game = allGames[gameId];
-
-        game.connect(gameId, userId);
+        game.connect(userId);
         res.render('game/game', { currentUser, gameId });
     };
 });

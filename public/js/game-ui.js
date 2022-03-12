@@ -10,10 +10,14 @@ canvas.height = 600;
 
 const socket = io();
 
-
 let lastPosition = null;
 let penDown = false;
 // let isDrawingPlayer = false;
+
+ctx.strokeStyle = 'hsla(40, 5%, 20%, 1)';
+ctx.lineWidth = 3;
+ctx.lineJoin = 'round';
+ctx.lineCap = 'round';
 
 const drawLineToPoint = (fromPosition, toPosition) => {
     ctx.beginPath();
