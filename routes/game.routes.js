@@ -36,4 +36,19 @@ router.get('/:gameId', (req, res) => {
     };
 });
 
+// router.post('/:gameId/drawing', (req, res) => {
+    // const { gameId } = req.params;
+    // const drawing = req.body;
+    // const userId = req.session.currentUser['_id'];
+    // const game = allGames[gameId];
+    // const players = game.players;
+    // const isPlayerDrawing = players[game.drawingPlayerIndex].userId === userId;
+    // if(isPlayerDrawing){
+        //     players[game.drawingPlayerIndex].highlights.push({
+            // url: canvas.toDataURL()
+            // word: game.nextWords[0]
+        // })
+        // };
+// })
+
 module.exports = router;

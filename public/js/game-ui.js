@@ -12,6 +12,11 @@ console.log(gameId)
 canvas.width = 600;
 canvas.height = 600;
 
+let isDrawing = false; // drawing player
+let currentLineIndex = 0; // drawing player
+let currentPlayers = []; // both players
+let currentWord = ''; // both players
+
 const socket = io();
 
 let lastPosition = null;
@@ -128,14 +133,73 @@ socket.on('playerlist changed', (players) => {
     });
 });
 
+const answerInput = document.getElementById('answer')
+answerInput.addEventListener('keydown', (event) =>{
+    const currentAttempt = answerInput.value;
+    if(currentAttempt.length > 0 && event.key === 'Enter'){
+        if(currentAttempt.toLowerCase() === currentWord.toLocaleLowerCase){
+            console.log(currentAttempt);
+            answerInput.classList.add('right-answer');
+            answerInput.value = '';
+            setTimeout(() => {
+                answerInput.classList.remove('wrong-answer');
+            }, 3000);
+            socket.emit('correct guess');
+        } else{
+            console.log(currentAttempt);
+            answerInput.classList.add('wrong-answer');
+            answerInput.value = '';
+            setTimeout(() => {
+                answerInput.classList.remove('wrong-answer');
+            }, 3000);
+        };
+    };
+});
+
+socket.on('change word', (word) => {
+    currentWord = word;
+    if(isDrawingPlayer){
+        showWordDisyplay();
+    }
+})
+
+
+
 leaveGame.onclick = () => socket.emit('leave game');
+
 
 // ------------------------------------------------------------
 
 
 
+// const updateWord = (word) => {
+//     const wordChanged = currentWord !== word;
+//     if(wordChanged) {
+//         currentWord = word;
+//         currentWordDisplay.textContent = currentWord;
+//         currentDrawingData.lines = [];
+//         isMatch = false;
+//     }
+// }
 
+// const updateInterval = setInterval(() => {
+//     // console.log(currentWord)
+//     requestUpdate()
+//         .then(data => {
+//             const { players, isPlayerDrawing, drawingData, word } = data;
 
+//             updatePlayerList(players);
+//             updateWord(word);
+
+//             isPlayersDrawingRound = isPlayerDrawing;
+
+//             if(!isPlayersDrawingRound) {
+//                 drawImageFromData(drawingData);
+//             };
+//         })
+//         .catch(error => console.error(error));
+
+//     });
 
 
 // let isPlayersDrawingRound = false;
@@ -149,29 +213,6 @@ leaveGame.onclick = () => socket.emit('leave game');
 // const currentDrawingData = {
 //     lines: []
 // };
-
-// const answerDiv = document.getElementById('answer');
-
-// const checkAnswer = (event) => {
-
-//     if(!isPlayersDrawingRound && event.key === 'Enter') {
-//         // console.log(currentWord);
-//         const { value } = event.target;
-//         if(currentWord.toLowerCase() === value.toLowerCase()) {
-//             answerDiv.classList.add('right-answer');
-//             isMatch = true;
-//             // send match to the server
-//         } else {
-//             answerDiv.classList.add('wrong-answer');
-//             event.target.value = '';
-//             setTimeout(() => {
-//                 answerDiv.classList.remove('wrong-answer')
-//             },3000);
-//         };
-//     };
-// };
-
-// answerDiv.addEventListener('keydown', checkAnswer)
 
 
 // canvas.addEventListener('mousedown', (event) => {
@@ -195,6 +236,7 @@ leaveGame.onclick = () => socket.emit('leave game');
 //                 }
 //             ]
 //         };
+
     
 //         currentDrawingData.lines.push(newLine);
     
