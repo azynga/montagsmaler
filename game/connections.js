@@ -5,11 +5,14 @@ module.exports = (gameId) => {
 
     io.on('connection', socket => {
         
+        const game = allGames[gameId];
+
+        socket.to(gameId).emit('player connected', game.players);
+        
         socket.on('disconnect', () => {
             console.log('user disconnected');
         });
-
-        const game = allGames[gameId];
+        
         
         if(game) {
             socket.join(gameId);
