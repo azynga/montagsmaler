@@ -18,11 +18,14 @@ let currentWord = ''; // both players
 
 const socket = io();
 
-
-
 let lastPosition = null;
 let penDown = false;
 // let isDrawingPlayer = false;
+
+ctx.strokeStyle = 'hsla(40, 5%, 20%, 1)';
+ctx.lineWidth = 3;
+ctx.lineJoin = 'round';
+ctx.lineCap = 'round';
 
 const drawLineToPoint = (fromPosition, toPosition) => {
     ctx.beginPath();
@@ -99,15 +102,13 @@ socket.on('line stop', () => {
     lastPosition = null;
 });
 
-
-window.onclick = () => {
-    socket.emit('hello');
-    console.log('hello emitted');
-};
-
-socket.on('sayhello', (userId) => {
-    console.log('received sayhello from server')
-    console.log('hello from ' + userId);
+socket.on('player connected', (players) => {
+    playerList.textContent = '';
+    players.forEach(player => {
+        const newPlayer = document.createElement('li');
+        newPlayer.textContent = player.username;
+        playerList.appendChild(newPlayer);
+    });
 });
 
 

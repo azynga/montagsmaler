@@ -2,7 +2,7 @@
 const axios = require('axios');
 
 const User = require('../models/User.model');
-const connect = require('./connections');
+const connectSocket = require('./connections');
 const allGames = {};
 
 class Game {
@@ -15,7 +15,15 @@ class Game {
         this.timer = null;
         this.activeRound = false;
         this.nextWords = this.getFirstWords();
-        this.connect = connect;
+    }
+
+    connect(userId) {
+        if(!this.players.some(player => player.userId === userId)) {
+            this.addPlayer(userId);
+            connectSocket(this.gameId);
+        } else {
+            console.log('connection rejected. user is already connected')
+        };
     }
 
     addPlayer(userId) {
