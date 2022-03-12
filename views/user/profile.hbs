@@ -1,0 +1,10 @@
+<h1>{{currentUser.username}}'s page</h1>
+<div id="container">
+<a href="/user/settings" style="color:black">Click here to edit your account details</a>
+
+{{#each currentUser.highlights}}
+    <div class="card">
+        <img src="{{url}}" alt="user drawing of {{word}}">
+    </div>
+{{/each}}
+</div>

@@ -5,15 +5,24 @@
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <meta http-equiv="X-UA-Compatible" content="ie=edge">
-      <title>{{appTitle}}</title>
+      <title>Game</title>
       <link rel="stylesheet" href="/stylesheets/style.css" />
    </head>
 
    <body>
+      <nav class="nav-bar">
+         <a href="/" class="nav-link">Home</a>
+         <a href="/game/matchlist" class="nav-link">Play</a>
+         {{#if currentUser}}
 
+         <a href="/user/profile" class="nav-link">{{currentUser.username}}'s profile</a>
+
+         <a href="/auth/logout">Log out</a>
+         {{else}}
+         <a href="/auth/login" class="nav-link">Login</a>
+         {{/if}}
+      </nav>
       {{{body}}}
-
-      <script src="/js/script.js"></script>
    </body>
 
-</html>
+</html> 

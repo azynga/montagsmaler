@@ -1,19 +1,30 @@
 const { Schema, model } = require("mongoose");
 
-// TODO: Please make sure you edit the user model to whatever makes sense in this case
 const userSchema = new Schema(
   {
     username: {
       type: String,
-      // unique: true -> Ideally, should be unique, but its up to you
+      unique: true
     },
-    password: String,
+    password: {
+      type: String,
+      required: true
+    },
+    avatarUrl: String,
+    highlights: [{
+      type: String,
+      url: String,
+      word: String, // this should be the word the drawing relates to
+    }],
   },
   {
-    // this second object adds extra properties: `createdAt` and `updatedAt`
     timestamps: true,
   }
 );
+
+const highlightSchema = new Schema({
+
+})
 
 const User = model("User", userSchema);
 

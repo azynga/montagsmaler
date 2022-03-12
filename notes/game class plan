@@ -1,0 +1,24 @@
+
+properties:
+    game id
+    playerslist -> list of player ids
+    current word
+    timer
+    round count
+    playerdrawing -> index number
+
+methods:
+    getWord -> axios request to wordsAPI
+    resetTimer
+    resetCanvas -> send a message to browser to clear the clear
+    nextRound -> increase playerdrawing index, resetCanvas, resetTimer, getWord
+    startGame
+
+
+
+    ///TODO: 
+
+    Alter player's profile;
+    Make it functional;
+    Maybe try using cloudinary to store the avatar || Using api to get avatars and display in registration form;
+    Make avatar preview functional;

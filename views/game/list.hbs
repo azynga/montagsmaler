@@ -1,0 +1,19 @@
+<h1>Game list</h1>
+
+<div id="container">
+
+    <a href="/game/create">Create new game</a>
+
+    <ul id="game-list">
+        {{#each allGames}}
+            <li class="game">
+                <a href="/game/{{gameId}}">
+                    <h3>Game Nr. {{@index}}</h3>
+                    <p>Current players: {{players.length}}</p>
+                    <p class="join">Join Game</p>
+                </a>
+            </li>
+        {{/each}}
+    </ul>
+
+</div>
