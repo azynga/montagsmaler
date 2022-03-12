@@ -118,34 +118,34 @@ socket.on('sayhello', (userId) => {
 
 
 
-const updateWord = (word) => {
-    const wordChanged = currentWord !== word;
-    if(wordChanged) {
-        currentWord = word;
-        currentWordDisplay.textContent = currentWord;
-        currentDrawingData.lines = [];
-        isMatch = false;
-    }
-}
+// const updateWord = (word) => {
+//     const wordChanged = currentWord !== word;
+//     if(wordChanged) {
+//         currentWord = word;
+//         currentWordDisplay.textContent = currentWord;
+//         currentDrawingData.lines = [];
+//         isMatch = false;
+//     }
+// }
 
-const updateInterval = setInterval(() => {
-    // console.log(currentWord)
-    requestUpdate()
-        .then(data => {
-            const { players, isPlayerDrawing, drawingData, word } = data;
+// const updateInterval = setInterval(() => {
+//     // console.log(currentWord)
+//     requestUpdate()
+//         .then(data => {
+//             const { players, isPlayerDrawing, drawingData, word } = data;
 
-            updatePlayerList(players);
-            updateWord(word);
+//             updatePlayerList(players);
+//             updateWord(word);
 
-            isPlayersDrawingRound = isPlayerDrawing;
+//             isPlayersDrawingRound = isPlayerDrawing;
 
-            if(!isPlayersDrawingRound) {
-                drawImageFromData(drawingData);
-            };
-        })
-        .catch(error => console.error(error));
+//             if(!isPlayersDrawingRound) {
+//                 drawImageFromData(drawingData);
+//             };
+//         })
+//         .catch(error => console.error(error));
 
-    });
+//     });
 
 
 // let isPlayersDrawingRound = false;
