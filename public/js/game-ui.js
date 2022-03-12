@@ -16,7 +16,7 @@ const socket = io();
 
 let lastPosition = null;
 let penDown = false;
-// let isDrawingPlayer = false;
+let isDrawingPlayer = false;
 
 
 socket.emit('join game', gameId);
@@ -57,22 +57,43 @@ const drawFromPlayerInput = (event) => {
     };
 };
 
-window.onmousedown = (event) => {
-    penDown = true;
-    drawFromPlayerInput(event);
+const setCanvasInteraction = () => {
+    window.onmousedown = (event) => {
+        penDown = true;
+        drawFromPlayerInput(event);
+    };
+    
+    window.onmouseup = () => {
+        penDown = false;
+        lastPosition = null;
+        socket.emit('line stop');
+        console.log('emit line stop');
+    };
+    
+    window.onmousemove = (event) => {
+        drawFromPlayerInput(event);
+    };
 };
 
-window.onmouseup = () => {
-    penDown = false;
-    lastPosition = null;
-    socket.emit('line stop');
-    console.log('emit line stop');
+const clearCanvasInteraction = () => {
+    window.onmousedown = null;
+    window.onmouseup = null;
+    window.onmousemove = null;
 };
 
-window.onmousemove = (event) => {
-    drawFromPlayerInput(event);
-};
+socket.on('is drawing player', () => {
+    isDrawingPlayer = true;
+    setCanvasInteraction();
+    hideInput();
+    showWordDisplay();
+});
 
+socket.on('is guessing player', () => {
+    isDrawingPlayer = false;
+    clearCanvasInteraction();
+    hideWordDisplay();
+    showInput();
+});
 
 
 const drawFromUpdate = (toPosition) => {
