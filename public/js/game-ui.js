@@ -138,7 +138,7 @@ answerInput.addEventListener('keydown', (event) =>{
 socket.on('change word', (word) => {
     currentWord = word;
     if(isDrawingPlayer){
-
+        showWordDisyplay();
     }
 })
 
