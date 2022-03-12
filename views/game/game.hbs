@@ -1,13 +1,17 @@
 
 <h3>Players: </h3>
-<ul id="player-list"></ul>
+<ul id="player-list">
+    {{#each players}}
+        <li>{{username}} – {{points}} Points</li>
+    {{/each}}
+</ul>
 <h4>Current Word: <span id="current-word"></span></h4>
 <canvas id="game-canvas"></canvas>
 <div>
     <input type="text" name="answer" id="answer" placeholder="Type here...">
 </div>
 
-<a href="/game/{{gameId}}/leave">Leave the game</a>
+<a id="leave-game" href="/game/matchlist">Leave the game</a>
 {{!-- <button id="drawing-button">Drawing</button>
 <button id="not-drawing-button">Not drawing</button> --}}
 

@@ -4,6 +4,10 @@ const ctx = canvas.getContext('2d');
 
 const playerList = document.getElementById('player-list');
 const currentWordDisplay = document.getElementById('current-word');
+const leaveGame = document.getElementById('leave-game');
+const gameId = window.location.pathname.slice(6);
+
+console.log(gameId)
 
 canvas.width = 600;
 canvas.height = 600;
@@ -13,6 +17,9 @@ const socket = io();
 let lastPosition = null;
 let penDown = false;
 // let isDrawingPlayer = false;
+
+
+// socket.emit('join game', gameId);
 
 ctx.strokeStyle = 'hsla(40, 5%, 20%, 1)';
 ctx.lineWidth = 3;
@@ -83,9 +90,6 @@ const drawFromUpdate = (toPosition) => {
 socket.on('drawing update', (toPosition) => {
     console.log('received drawing update');
     
-    console.log(penDown);
-    console.log(toPosition);
-    
     drawFromUpdate(toPosition);
 });
 
@@ -94,16 +98,16 @@ socket.on('line stop', () => {
     lastPosition = null;
 });
 
-socket.on('player connected', (players) => {
+socket.on('playerlist changed', (players) => {
     playerList.textContent = '';
     players.forEach(player => {
         const newPlayer = document.createElement('li');
-        newPlayer.textContent = player.username;
+        newPlayer.textContent = `${player.username} – ${player.points} Points`;
         playerList.appendChild(newPlayer);
     });
 });
 
-
+leaveGame.onclick = () => socket.emit('disconnect');
 
 // ------------------------------------------------------------
 

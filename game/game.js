@@ -20,7 +20,7 @@ class Game {
     connect(userId) {
         if(!this.players.some(player => player.userId === userId)) {
             this.addPlayer(userId);
-            connectSocket(this.gameId);
+            connectSocket(this.gameId, userId);
         } else {
             console.log('connection rejected. user is already connected')
         };
