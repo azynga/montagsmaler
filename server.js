@@ -11,8 +11,6 @@ const server = app.listen(PORT, () => {
 
 const io = socket(server);
 
+const connectGame = require('./game/connections');
 
-
-// setInterval(() => console.log(io.sockets.adapter.rooms.entries()), 1000)
-
-module.exports = io;
+connectGame(io);

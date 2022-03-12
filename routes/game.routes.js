@@ -30,8 +30,7 @@ router.get('/:gameId', (req, res) => {
     } else {
         const { currentUser } = req.session;
         const userId = currentUser['_id'];
-        // game.addPlayer(userId);
-        game.connect(userId);
+        game.addPlayer(userId);
         const players = game.players;
         res.render('game/game', { currentUser, gameId, players });
     };
