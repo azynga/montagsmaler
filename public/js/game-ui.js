@@ -19,7 +19,7 @@ let penDown = false;
 // let isDrawingPlayer = false;
 
 
-// socket.emit('join game', gameId);
+socket.emit('join game', gameId);
 
 ctx.strokeStyle = 'hsla(40, 5%, 20%, 1)';
 ctx.lineWidth = 3;
@@ -107,7 +107,7 @@ socket.on('playerlist changed', (players) => {
     });
 });
 
-leaveGame.onclick = () => socket.emit('disconnect');
+leaveGame.onclick = () => socket.emit('leave game');
 
 // ------------------------------------------------------------
 
