@@ -11,6 +11,8 @@ const server = app.listen(PORT, () => {
 
 const io = socket(server);
 
+
+
 // setInterval(() => console.log(io.sockets.adapter.rooms.entries()), 1000)
 
 module.exports = io;

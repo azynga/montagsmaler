@@ -4,12 +4,13 @@ const ctx = canvas.getContext('2d');
 
 const playerList = document.getElementById('player-list');
 const currentWordDisplay = document.getElementById('current-word');
+const leaveGame = document.getElementById('leave-game');
+const gameId = window.location.pathname.slice(6);
+
+console.log(gameId)
 
 canvas.width = 600;
 canvas.height = 600;
-
-
-let isPlayersDrawingRound = false; // both players
 
 let isDrawing = false; // drawing player
 let currentLineIndex = 0; // drawing player
@@ -20,7 +21,10 @@ const socket = io();
 
 let lastPosition = null;
 let penDown = false;
-// let isDrawingPlayer = false;
+let isDrawingPlayer = false;
+
+
+// socket.emit('join game', gameId);
 
 ctx.strokeStyle = 'hsla(40, 5%, 20%, 1)';
 ctx.lineWidth = 3;
@@ -91,9 +95,6 @@ const drawFromUpdate = (toPosition) => {
 socket.on('drawing update', (toPosition) => {
     console.log('received drawing update');
     
-    console.log(penDown);
-    console.log(toPosition);
-    
     drawFromUpdate(toPosition);
 });
 
@@ -102,58 +103,48 @@ socket.on('line stop', () => {
     lastPosition = null;
 });
 
-socket.on('player connected', (players) => {
+socket.on('playerlist changed', (players) => {
     playerList.textContent = '';
     players.forEach(player => {
         const newPlayer = document.createElement('li');
-        newPlayer.textContent = player.username;
+        newPlayer.textContent = `${player.username} – ${player.points} Points`;
         playerList.appendChild(newPlayer);
     });
 });
 
 const answerInput = document.getElementById('answer')
-answerInput.addEventListener('keydown', checkAnswer);
-
-const checkAnswer = (event) => {
-    if(answerInput.value.length > 0 && event.key === 'Enter'){
-        let currentAttempt = answerInput.value;
+answerInput.addEventListener('keydown', (event) =>{
+    const currentAttempt = answerInput.value;
+    if(currentAttempt.length > 0 && event.key === 'Enter'){
         if(currentAttempt.toLowerCase() === currentWord.toLocaleLowerCase){
+            console.log(currentAttempt);
             answerInput.classList.add('right-answer');
-            
-            socket.on('check answer');
-            
-        }
-        
-    }
+            answerInput.value = '';
+            setTimeout(() => {
+                answerInput.classList.remove('wrong-answer');
+            }, 3000);
+            socket.emit('correct guess');
+        } else{
+            console.log(currentAttempt);
+            answerInput.classList.add('wrong-answer');
+            answerInput.value = '';
+            setTimeout(() => {
+                answerInput.classList.remove('wrong-answer');
+            }, 3000);
+        };
+    };
+});
 
-}
-     
+socket.on('change word', (word) => {
+    currentWord = word;
+    if(isDrawingPlayer){
+
+    }
+})
 
 
 
 // ------------------------------------------------------------
-
-
-// const answerDiv = document.getElementById('answer');
-
-// const checkAnswer = (event) => {
-
-//     if(!isPlayersDrawingRound && event.key === 'Enter') {
-//         // console.log(currentWord);
-//         const { value } = event.target;
-//         if(currentWord.toLowerCase() === value.toLowerCase()) {
-//             answerDiv.classList.add('right-answer');
-//             isMatch = true;
-//             // send match to the server
-//         } else {
-//             answerDiv.classList.add('wrong-answer');
-//             event.target.value = '';
-//             setTimeout(() => {
-//                 answerDiv.classList.remove('wrong-answer')
-//             },3000);
-//         };
-//     };
-// };
 
 
 
@@ -198,9 +189,6 @@ const checkAnswer = (event) => {
 // const currentDrawingData = {
 //     lines: []
 // };
-
-
-// answerDiv.addEventListener('keydown', checkAnswer)
 
 
 // canvas.addEventListener('mousedown', (event) => {

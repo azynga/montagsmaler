@@ -23,15 +23,17 @@ router.get('/create', (req, res) => {
 
 router.get('/:gameId', (req, res) => {
     const { gameId } = req.params;
-    
-    if(!allGames[gameId]) {
+    const game = allGames[gameId];
+
+    if(!game) {
         res.send('Woops! This game ID was not found. <a href="/game/matchlist">Back to list of games</a>');
     } else {
         const { currentUser } = req.session;
         const userId = currentUser['_id'];
-        const game = allGames[gameId];
+        // game.addPlayer(userId);
         game.connect(userId);
-        res.render('game/game', { currentUser, gameId });
+        const players = game.players;
+        res.render('game/game', { currentUser, gameId, players });
     };
 });
 

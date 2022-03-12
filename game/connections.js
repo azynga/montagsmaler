@@ -6,18 +6,22 @@ module.exports = (gameId, userId) => {
     io.on('connection', socket => {
         
         const game = allGames[gameId];
+        // const player = game.players.find(player => player.userId === userId);
+        
+        // player.socketId = socket.id;
 
-        socket.to(gameId).emit('player connected', game.players);
+        // socket.to(gameId).emit('playerlist changed', game.players);
         
         socket.on('disconnect', () => {
             console.log('user disconnected');
+            game.removePlayer(userId);
+            // socket.to(gameId).emit('playerlist changed', game.players);
         });
-        
         
         if(game) {
             socket.join(gameId);
             console.log('user connected');
-            console.log(io.sockets.adapter.rooms.entries());
+            // console.log(io.sockets.adapter.rooms);
             
             socket.on('drawing', (toPosition) => {
                 console.log('server received the drawing data');
@@ -25,7 +29,14 @@ module.exports = (gameId, userId) => {
             });
         
             socket.on('line stop', () => {
-                socket.broadcast.to(gameId).emit('line stop')
+                socket.broadcast.to(gameId).emit('line stop');
+                console.log(game.players);
+                console.log(socket.id);
+            });
+
+            socket.on('correct guess', () => {
+                const nextWord = game.nextWord();
+                socket.emit('change word', nextWord);
             });
         
         } else {
