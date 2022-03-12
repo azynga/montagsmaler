@@ -111,11 +111,49 @@ socket.on('player connected', (players) => {
     });
 });
 
+const answerInput = document.getElementById('answer')
+answerInput.addEventListener('keydown', checkAnswer);
+
+const checkAnswer = (event) => {
+    if(answerInput.value.length > 0 && event.key === 'Enter'){
+        let currentAttempt = answerInput.value;
+        if(currentAttempt.toLowerCase() === currentWord.toLocaleLowerCase){
+            answerInput.classList.add('right-answer');
+            
+            socket.on('check answer');
+            
+        }
+        
+    }
+
+}
+     
+
 
 
 // ------------------------------------------------------------
 
 
+// const answerDiv = document.getElementById('answer');
+
+// const checkAnswer = (event) => {
+
+//     if(!isPlayersDrawingRound && event.key === 'Enter') {
+//         // console.log(currentWord);
+//         const { value } = event.target;
+//         if(currentWord.toLowerCase() === value.toLowerCase()) {
+//             answerDiv.classList.add('right-answer');
+//             isMatch = true;
+//             // send match to the server
+//         } else {
+//             answerDiv.classList.add('wrong-answer');
+//             event.target.value = '';
+//             setTimeout(() => {
+//                 answerDiv.classList.remove('wrong-answer')
+//             },3000);
+//         };
+//     };
+// };
 
 
 
@@ -161,26 +199,6 @@ socket.on('player connected', (players) => {
 //     lines: []
 // };
 
-// const answerDiv = document.getElementById('answer');
-
-// const checkAnswer = (event) => {
-
-//     if(!isPlayersDrawingRound && event.key === 'Enter') {
-//         // console.log(currentWord);
-//         const { value } = event.target;
-//         if(currentWord.toLowerCase() === value.toLowerCase()) {
-//             answerDiv.classList.add('right-answer');
-//             isMatch = true;
-//             // send match to the server
-//         } else {
-//             answerDiv.classList.add('wrong-answer');
-//             event.target.value = '';
-//             setTimeout(() => {
-//                 answerDiv.classList.remove('wrong-answer')
-//             },3000);
-//         };
-//     };
-// };
 
 // answerDiv.addEventListener('keydown', checkAnswer)
 

@@ -1,4 +1,4 @@
-module.exports = (gameId) => {
+module.exports = (gameId, userId) => {
     
     const { allGames } = require('./game');
     const io = require('../server');
