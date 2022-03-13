@@ -5,9 +5,9 @@ const ctx = canvas.getContext('2d');
 const playerList = document.getElementById('player-list');
 const currentWordDisplay = document.getElementById('current-word');
 const leaveGame = document.getElementById('leave-game');
-const gameId = window.location.pathname.slice(6);
+const readyButton = document.getElementById('ready');
 
-console.log(gameId)
+const gameId = window.location.pathname.slice(6);
 
 canvas.width = 600;
 canvas.height = 600;
@@ -89,15 +89,19 @@ const clearCanvasInteraction = () => {
 socket.on('is drawing player', () => {
     isDrawingPlayer = true;
     setCanvasInteraction();
-    hideInput();
-    showWordDisplay();
+    currentWordDisplay.textContent = currentWord;
+    currentWordDisplay.style.visibility = 'visible';
+    // showWordDisplay();
+    // hideInput();
 });
 
 socket.on('is guessing player', () => {
     isDrawingPlayer = false;
     clearCanvasInteraction();
-    hideWordDisplay();
-    showInput();
+    currentWordDisplay.style.visibility = 'hidden';
+
+    // hideWordDisplay();
+    // showInput();
 });
 
 
@@ -124,7 +128,7 @@ socket.on('line stop', () => {
     lastPosition = null;
 });
 
-socket.on('playerlist changed', (players) => {
+socket.on('playerlist change', (players) => {
     playerList.textContent = '';
     players.forEach(player => {
         const newPlayer = document.createElement('li');
@@ -133,11 +137,25 @@ socket.on('playerlist changed', (players) => {
     });
 });
 
+socket.on('next word', (word) => {
+    console.log('received next word')
+    const drawingUrl = canvas.toDataURL();
+    socket.emit('store drawing', drawingUrl);
+
+    currentWord = word;
+});
+
+socket.on('end round', () => {
+    clearCanvasInteraction();
+});
+
 const answerInput = document.getElementById('answer')
 answerInput.addEventListener('keydown', (event) =>{
     const currentAttempt = answerInput.value;
+    console.log(currentAttempt);
+    console.log(currentWord);
     if(currentAttempt.length > 0 && event.key === 'Enter'){
-        if(currentAttempt.toLowerCase() === currentWord.toLocaleLowerCase){
+        if(currentAttempt.toLowerCase() === currentWord.toLocaleLowerCase) {
             console.log(currentAttempt);
             answerInput.classList.add('right-answer');
             answerInput.value = '';
@@ -163,7 +181,7 @@ socket.on('change word', (word) => {
     }
 })
 
-
+readyButton.onclick = () => socket.emit('player ready');
 
 leaveGame.onclick = () => socket.emit('leave game');
 

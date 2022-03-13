@@ -13,11 +13,11 @@ module.exports = (io) => {
           lastPlayerAdded.socketId = socket.id;
           const userId = lastPlayerAdded.userId;
       
-          socket.to(gameId).emit('playerlist changed', players);
+          // socket.to(gameId).emit('playerlist changed', players);
       
           socket.on('leave game', () => {
             game.removePlayer(userId);
-            socket.to(gameId).emit('playerlist changed', players);
+            // socket.to(gameId).emit('playerlist changed', players);
           });
       
           socket.on('drawing', (toPosition) => {
@@ -30,7 +30,15 @@ module.exports = (io) => {
             console.log(game.players);
             console.log(socket.id);
           });
-      
+
+          socket.on('player ready', () => {
+            game.playerIsReady(socket.id);
+          });
+
+          socket.on('correct guess', () => {
+            game.correctGuess(socket.id);
+          });
+
         });
         
         socket.on('disconnect', () => {
