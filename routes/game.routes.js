@@ -2,7 +2,7 @@
 const router = require('express').Router();
 
 // Internal imports
-const { allGames, Game } = require('../game/game');
+const { allGames, usersInGames, Game } = require('../game/game');
 const User = require('../models/User.model');
 const { isLoggedIn } = require('../middleware/route-guard.js');
 
@@ -15,21 +15,30 @@ router.get('/matchlist', isLoggedIn, (req, res, next) => {
 });
 
 router.get('/create', (req, res) => {
-    const game = new Game();
-    allGames[game.gameId] = game;
-    res.redirect(`/game/${game.gameId}`);
+    const { currentUser } = req.session;
+    const userId = currentUser['_id'];
+
+    if(!usersInGames[userId]) {
+        const game = new Game();
+        allGames[game.gameId] = game;
+        res.redirect(`/game/${game.gameId}`);
+    } else {
+        res.send('Woops! Looks like you\'re already in a game. <a href="/game/matchlist">Back to list of games</a>');
+    };
 });
 
 
 router.get('/:gameId', (req, res) => {
     const { gameId } = req.params;
     const game = allGames[gameId];
+    const { currentUser } = req.session;
+    const userId = currentUser['_id'];
 
     if(!game) {
         res.send('Woops! This game ID was not found. <a href="/game/matchlist">Back to list of games</a>');
+    } else if(usersInGames[userId] && !game.players.some(player => player.userId === userId)) {
+        res.send('Woops! Looks like you\'re already in a game. <a href="/game/matchlist">Back to list of games</a>');
     } else {
-        const { currentUser } = req.session;
-        const userId = currentUser['_id'];
         game.addPlayer(userId);
         const players = game.players;
         res.render('game/game', { currentUser, gameId, players });

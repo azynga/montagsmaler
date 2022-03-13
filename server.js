@@ -9,8 +9,8 @@ const server = app.listen(PORT, () => {
   console.log(`Server listening on port http://localhost:${PORT}`);
 });
 
-const io = socket(server);
+global.io = socket(server);
 
 const connectGame = require('./game/connections');
 
-connectGame(io);
+connectGame(global.io);
