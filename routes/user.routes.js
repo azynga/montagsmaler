@@ -14,7 +14,16 @@ const saltRounds = 10
 // Get requests
 router.get('/profile', isLoggedIn, (req, res, next) => {
   const { currentUser } = req.session;
-  res.render('user/profile', { currentUser });
+  const userId = currentUser['_id']
+  console.log(currentUser);
+  User.findById(userId, { drawings: 1, '_id': 0 })
+    .populate('drawings')
+    .then(result => {
+      const userDrawings = result.drawings;
+      console.log(userDrawings)
+      res.render('user/profile', { currentUser, userDrawings });
+    })
+    .catch(error => console.error(error));
 });
 
 router.get('/settings', isLoggedIn, (req, res, next) => {
@@ -34,7 +43,7 @@ router.post('/settings', (req, res, next) => {
 
   console.log(oldPassword, newPassword);
   const { currentUser } = req.session;
-  const userId = req.session.currentUser['_id']
+  const userId = currentUser['_id']
   // console.log('user id:',userId)
   User.findOne({ username: currentUser.username })
     .then(user => {

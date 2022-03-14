@@ -3,6 +3,7 @@ const router = require('express').Router();
 
 // Internal imports
 const { allGames, usersInGames, Game } = require('../game/game');
+const User = require('../models/User.model');
 const Drawing = require('../models/Drawing.model');
 const { isLoggedIn } = require('../middleware/route-guard.js');
 
@@ -45,9 +46,19 @@ router.get('/:gameId', (req, res) => {
 });
 
 router.post('/:gameId/drawing-store', (req, res) => {
+    const { currentUser } = req.session;
+    const userId = currentUser['_id'];
     const drawingInfo = req.body;
     Drawing.create(drawingInfo)
-        .then(() => console.log('Drawing stored in DB'))
+        .then(drawing => {
+            console.log('Drawing stored in DB')
+            return User.findByIdAndUpdate(userId, {
+                $push: { drawings: drawing['_id'] }
+            });
+        })
+        .then(user => {
+            console.log('Drawing added to user: ' + user.username)
+        })
         .catch(error => console.error(error));
 });
 

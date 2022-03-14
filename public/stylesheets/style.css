@@ -111,3 +111,23 @@ form {
   border: dashed 5px rgb(225, 73, 73); 
 
 }
+
+#drawing-album {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  gap: 10px;
+}
+
+.drawing-card {
+  margin: 0;
+  /* border: solid 1px black; */
+  background-color: rgb(224, 215, 206);
+  padding: 5px;
+}
+
+.drawing {
+  width: 150px;
+  background-color: white;
+  /* border: solid 2px black; */
+}
