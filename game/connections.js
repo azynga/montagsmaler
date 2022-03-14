@@ -39,6 +39,10 @@ module.exports = (io) => {
             game.correctGuess(socket.id);
           });
 
+          socket.on('store drawing', (drawingUrl) =>{
+            //receive the drawing url from frontend and store it on respective user database => request User to find
+          });
+
         });
         
         socket.on('disconnect', () => {

@@ -143,6 +143,8 @@ socket.on('next word', (word) => {
     socket.emit('store drawing', drawingUrl);
 
     currentWord = word;
+    currentWordDisplay.textContent = currentWord;
+
 });
 
 socket.on('end round', () => {
@@ -152,19 +154,18 @@ socket.on('end round', () => {
 const answerInput = document.getElementById('answer')
 answerInput.addEventListener('keydown', (event) =>{
     const currentAttempt = answerInput.value;
-    console.log(currentAttempt);
-    console.log(currentWord);
-    if(currentAttempt.length > 0 && event.key === 'Enter'){
-        if(currentAttempt.toLowerCase() === currentWord.toLocaleLowerCase) {
-            console.log(currentAttempt);
+    if(currentAttempt.length > 0 && event.code === 'Enter'){
+        // console.log(currentAttempt, currentWord);
+        if(currentAttempt.toLowerCase() === currentWord.toLowerCase()) {
+            // console.log(currentAttempt);
             answerInput.classList.add('right-answer');
             answerInput.value = '';
             setTimeout(() => {
-                answerInput.classList.remove('wrong-answer');
+                answerInput.classList.remove('right-answer');
             }, 3000);
             socket.emit('correct guess');
         } else{
-            console.log(currentAttempt);
+            // console.log(currentAttempt);
             answerInput.classList.add('wrong-answer');
             answerInput.value = '';
             setTimeout(() => {
@@ -174,12 +175,7 @@ answerInput.addEventListener('keydown', (event) =>{
     };
 });
 
-socket.on('change word', (word) => {
-    currentWord = word;
-    if(isDrawingPlayer){
-        showWordDisyplay();
-    }
-})
+
 
 readyButton.onclick = () => socket.emit('player ready');
 
