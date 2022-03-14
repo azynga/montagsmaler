@@ -3,7 +3,7 @@ const router = require('express').Router();
 
 // Internal imports
 const { allGames, usersInGames, Game } = require('../game/game');
-const User = require('../models/User.model');
+const Drawing = require('../models/Drawing.model');
 const { isLoggedIn } = require('../middleware/route-guard.js');
 
 
@@ -27,7 +27,6 @@ router.get('/create', (req, res) => {
     };
 });
 
-
 router.get('/:gameId', (req, res) => {
     const { gameId } = req.params;
     const game = allGames[gameId];
@@ -45,19 +44,11 @@ router.get('/:gameId', (req, res) => {
     };
 });
 
-// router.post('/:gameId/drawing', (req, res) => {
-    // const { gameId } = req.params;
-    // const drawing = req.body;
-    // const userId = req.session.currentUser['_id'];
-    // const game = allGames[gameId];
-    // const players = game.players;
-    // const isPlayerDrawing = players[game.drawingPlayerIndex].userId === userId;
-    // if(isPlayerDrawing){
-        //     players[game.drawingPlayerIndex].highlights.push({
-            // url: canvas.toDataURL()
-            // word: game.nextWords[0]
-        // })
-        // };
-// })
+router.post('/:gameId/drawing-store', (req, res) => {
+    const drawingInfo = req.body;
+    Drawing.create(drawingInfo)
+        .then(() => console.log('Drawing stored in DB'))
+        .catch(error => console.error(error));
+});
 
 module.exports = router;

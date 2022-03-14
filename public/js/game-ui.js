@@ -1,3 +1,4 @@
+
 // Set up canvas
 const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
@@ -6,25 +7,20 @@ const playerList = document.getElementById('player-list');
 const currentWordDisplay = document.getElementById('current-word');
 const leaveGame = document.getElementById('leave-game');
 const readyButton = document.getElementById('ready');
-
-const gameId = window.location.pathname.slice(6);
+const timer = document.getElementById('timer');
 
 canvas.width = 600;
 canvas.height = 600;
 
-let isDrawing = false; // drawing player
-let currentLineIndex = 0; // drawing player
-let currentPlayers = []; // both players
-let currentWord = ''; // both players
-
 const socket = io();
 
-let lastPosition = null;
+let currentWord = ''; // both players
+let lastDrawPosition = null;
 let penDown = false;
 let isDrawingPlayer = false;
+let timerId = null;
 
-
-socket.emit('join game', gameId);
+socket.emit('join game', gameId, userId);
 
 ctx.strokeStyle = 'hsla(40, 5%, 20%, 1)';
 ctx.lineWidth = 3;
@@ -47,7 +43,7 @@ const drawFromPlayerInput = (event) => {
             y: offsetY
         };
 
-        let fromPosition = lastPosition;
+        let fromPosition = lastDrawPosition;
 
         if(!fromPosition) {
             fromPosition = toPosition;
@@ -58,7 +54,7 @@ const drawFromPlayerInput = (event) => {
         socket.emit('drawing', toPosition);
         console.log('emit drawing ');
 
-        lastPosition = toPosition;
+        lastDrawPosition = toPosition;
     };
 };
 
@@ -70,7 +66,7 @@ const setCanvasInteraction = () => {
     
     window.onmouseup = () => {
         penDown = false;
-        lastPosition = null;
+        lastDrawPosition = null;
         socket.emit('line stop');
         console.log('emit line stop');
     };
@@ -86,34 +82,15 @@ const clearCanvasInteraction = () => {
     window.onmousemove = null;
 };
 
-socket.on('is drawing player', () => {
-    isDrawingPlayer = true;
-    setCanvasInteraction();
-    currentWordDisplay.textContent = currentWord;
-    currentWordDisplay.style.visibility = 'visible';
-    // showWordDisplay();
-    // hideInput();
-});
-
-socket.on('is guessing player', () => {
-    isDrawingPlayer = false;
-    clearCanvasInteraction();
-    currentWordDisplay.style.visibility = 'hidden';
-
-    // hideWordDisplay();
-    // showInput();
-});
-
-
 const drawFromUpdate = (toPosition) => {
-    let fromPosition = lastPosition;
+    let fromPosition = lastDrawPosition;
     
     if(!fromPosition) {
         fromPosition = toPosition;
     };
     
     drawLineToPoint(fromPosition, toPosition);
-    lastPosition = toPosition;
+    lastDrawPosition = toPosition;
 };
 
 
@@ -125,7 +102,7 @@ socket.on('drawing update', (toPosition) => {
 
 socket.on('line stop', () => {
     console.log('received line stop');
-    lastPosition = null;
+    lastDrawPosition = null;
 });
 
 socket.on('playerlist change', (players) => {
@@ -137,36 +114,75 @@ socket.on('playerlist change', (players) => {
     });
 });
 
-socket.on('next word', (word) => {
+socket.on('next word', (word, currentRound) => {
     console.log('received next word')
-    const drawingUrl = canvas.toDataURL();
-    socket.emit('store drawing', drawingUrl);
+    if(isDrawingPlayer && currentRound > 0) {
 
+        axios.post(`/game/${gameId}/drawing-store`, {
+            creator: userId,
+            word: currentWord,
+            url: canvas.toDataURL(),
+            isPublic: false
+        });
+        
+    };
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     currentWord = word;
+    currentWordDisplay.textContent = currentWord;
+});
+
+socket.on('start round', (drawingPlayerId) => {
+
+    readyButton.style.visibility = 'hidden';
+    timer.textContent = 120;
+
+    timerId = setInterval(() => {
+        timer.textContent -= 1;
+        if(timer.textContent <= 0) {
+            clearInterval(timerId);
+        };
+    }, 1000);
+
+    if(drawingPlayerId === userId) {
+        isDrawingPlayer = true;
+        setCanvasInteraction();
+        currentWordDisplay.textContent = currentWord;
+        currentWordDisplay.style.visibility = 'visible';
+        answerInput.disabled = true;
+        // showWordDisplay();
+        // hideInput();
+    } else {
+        isDrawingPlayer = false;
+        clearCanvasInteraction();
+        currentWordDisplay.style.visibility = 'hidden';
+        answerInput.disabled = false;
+        // hideWordDisplay();
+        // showInput();
+    };
 });
 
 socket.on('end round', () => {
+
+    readyButton.style.visibility = 'visible';
     clearCanvasInteraction();
 });
 
-const answerInput = document.getElementById('answer')
+const answerInput = document.getElementById('answer');
+
 answerInput.addEventListener('keydown', (event) =>{
     const currentAttempt = answerInput.value;
-    console.log(currentAttempt);
-    console.log(currentWord);
+    
     if(currentAttempt.length > 0 && event.key === 'Enter'){
-        if(currentAttempt.toLowerCase() === currentWord.toLocaleLowerCase) {
-            console.log(currentAttempt);
+        answerInput.value = '';
+        
+        if(currentAttempt.toLowerCase() === currentWord.toLowerCase()) {
             answerInput.classList.add('right-answer');
-            answerInput.value = '';
             setTimeout(() => {
-                answerInput.classList.remove('wrong-answer');
+                answerInput.classList.remove('right-answer');
             }, 3000);
             socket.emit('correct guess');
         } else{
-            console.log(currentAttempt);
             answerInput.classList.add('wrong-answer');
-            answerInput.value = '';
             setTimeout(() => {
                 answerInput.classList.remove('wrong-answer');
             }, 3000);
@@ -174,194 +190,6 @@ answerInput.addEventListener('keydown', (event) =>{
     };
 });
 
-socket.on('change word', (word) => {
-    currentWord = word;
-    if(isDrawingPlayer){
-        showWordDisyplay();
-    }
-})
-
 readyButton.onclick = () => socket.emit('player ready');
 
 leaveGame.onclick = () => socket.emit('leave game');
-
-
-// ------------------------------------------------------------
-
-
-
-// const updateWord = (word) => {
-//     const wordChanged = currentWord !== word;
-//     if(wordChanged) {
-//         currentWord = word;
-//         currentWordDisplay.textContent = currentWord;
-//         currentDrawingData.lines = [];
-//         isMatch = false;
-//     }
-// }
-
-// const updateInterval = setInterval(() => {
-//     // console.log(currentWord)
-//     requestUpdate()
-//         .then(data => {
-//             const { players, isPlayerDrawing, drawingData, word } = data;
-
-//             updatePlayerList(players);
-//             updateWord(word);
-
-//             isPlayersDrawingRound = isPlayerDrawing;
-
-//             if(!isPlayersDrawingRound) {
-//                 drawImageFromData(drawingData);
-//             };
-//         })
-//         .catch(error => console.error(error));
-
-//     });
-
-
-// let isPlayersDrawingRound = false;
-
-// let isDrawing = false;
-// let currentLineIndex = 0;
-// let currentPlayers = [];
-// let currentWord = '';
-// let isMatch = false;
-
-// const currentDrawingData = {
-//     lines: []
-// };
-
-
-// canvas.addEventListener('mousedown', (event) => {
-//     if(isPlayersDrawingRound) {
-//         isDrawing = true;
-    
-//         // Line styles
-//         ctx.strokeStyle = 'hsla(180, 80%, 20%, 1)';
-//         ctx.lineWidth = 10;
-//         ctx.lineJoin = 'round';
-//         ctx.lineCap = 'round';
-        
-//         // Add start a new line in drawingData
-//         const newLine = {
-//             color: ctx.strokeStyle,
-//             width: ctx.lineWidth,
-//             points: [
-//                 {
-//                     x: event.offsetX,
-//                     y: event.offsetY
-//                 }
-//             ]
-//         };
-
-    
-//         currentDrawingData.lines.push(newLine);
-    
-//         // Rendering start point
-//         ctx.beginPath();
-//         ctx.moveTo(event.offsetX, event.offsetY);
-//         ctx.lineTo(event.offsetX, event.offsetY);
-//         ctx.stroke();
-//     }
-// });
-
-// canvas.addEventListener('mouseup', () => {
-//     // Close the current line and go to next line index
-//     isDrawing = false;
-//     currentLineIndex += 1;
-//     ctx.closePath();
-// });
-
-// canvas.addEventListener('mousemove', (event) => {
-//     if(isPlayersDrawingRound && isDrawing) {
-//         const currentLinePoints = currentDrawingData.lines[currentLineIndex].points;
-
-//         // Add mouse coordinates to current line
-//         currentLinePoints.push({
-//             x: event.offsetX,
-//             y: event.offsetY
-//         });
-        
-//         // Rendering line
-//         ctx.lineTo(event.offsetX, event.offsetY);
-//         ctx.stroke();
-//     };
-// });
-
-// const drawPath = (points) => {
-//     const startingPoint = points[0];
-//     ctx.moveTo(startingPoint.x, startingPoint.y);
-
-//     points.forEach(point => {
-//         ctx.lineTo(point.x, point.y);
-//     });
-
-//     ctx.stroke();
-// };
-
-// const drawImageFromData = (drawingData) => {
-//     canvas.width = canvas.width;
-//     const { lines } = drawingData;
-//     lines.forEach(line => {
-//         ctx.strokeStyle = line.color;
-//         ctx.lineWidth = line.width;
-//         ctx.lineJoin = 'round';
-//         ctx.lineCap = 'round';
-
-//         drawPath(line.points);
-//     });
-// };
-
-// const updatePlayerList = (players) => {
-//     const playersChanged = JSON.stringify(currentPlayers) !== JSON.stringify(players);
-
-//     if(playersChanged) {
-//         currentPlayers = players;
-//         playerList.textContent = '';
-//         currentPlayers.forEach(player => {
-//             const newPlayer = document.createElement('li');
-//             newPlayer.textContent = `${player.username} – ${player.points} Points`;
-//             playerList.appendChild(newPlayer);
-//         });
-//     };
-// };
-
-// const updateWord = (word) => {
-//     wordChanged = currentWord !== word;
-//     if(wordChanged) {
-//         currentWord = word;
-//         currentWordDisplay.textContent = currentWord;
-//         currentDrawingData.lines = [];
-//         isMatch = false;
-//     }
-// }
-
-// const updateInterval = setInterval(() => {
-//     // console.log(currentWord)
-//     requestUpdate()
-//         .then(data => {
-//             const { players, isPlayerDrawing, drawingData, word } = data;
-
-//             updatePlayerList(players);
-//             updateWord(word);
-
-//             isPlayersDrawingRound = isPlayerDrawing;
-
-//             if(!isPlayersDrawingRound) {
-//                 drawImageFromData(drawingData);
-//             };
-//         })
-//         .catch(error => console.error(error));
-    
-    
-
-//     if(isPlayersDrawingRound) {
-//         sendUpdate(currentDrawingData);
-//     } else {
-//         sendUpdate(null, isMatch)
-//     };
-
-// }, 1000/5);
-
-// ------------------------------------------------------------

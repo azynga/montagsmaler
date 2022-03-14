@@ -1,6 +1,5 @@
 
 const User = require('../models/User.model');
-const Drawing = require('../models/User.model');
 const wordsCollection = require('../data/words.json');
 
 const wordsList = Object.keys(wordsCollection);
@@ -12,8 +11,11 @@ class Game {
         this.gameId = Date.now().toString(36);
         this.players = [];
         this.roundTime = 120;
+        this.currentRound = 0;
         this.timerId = null;
         this.activeRound = false;
+        this.drawingData = [[]];
+        this.lineIndex = 0;
     }
 
     addPlayer(userId) {
@@ -60,14 +62,16 @@ class Game {
         console.log(player);
         console.log(socketId);
         player.isReady = true;
-        if(this.players.every(player => player.isReady)) {
+        if(this.players.length > 1 && this.players.every(player => player.isReady)) {
             this.startRound();
         };
     }
 
     startRound() {
-        this.activeRound = true;
+        const drawingPlayer = this.players[0];
         let secondsLeft = this.roundTime;
+        this.activeRound = true;
+
         this.timerId = setInterval(() => {
             secondsLeft -= 1;
             if(secondsLeft <= 0) {
@@ -77,26 +81,24 @@ class Game {
 
         this.nextWord();
 
-        this.players.forEach((player, index) => {
-            if(index === 0) {
-                global.io.to(player.socketId).emit('is drawing player');
-            } else {
-                global.io.to(player.socketId).emit('is guessing player');
-            };
-            global.io.to(this.gameId).emit('start round');
-        });
+        this.currentRound += 1;
+
+        global.io.to(this.gameId).emit('start round', drawingPlayer.userId);
     }
 
     endRound() {
         this.activeRound = false;
         clearInterval(this.timerId);
         this.players.push(this.players.shift());
+        this.players.forEach(player => player.isReady = false);
         global.io.to(this.gameId).emit('end round');
     }
 
     nextWord() {
+        this.drawingData = [[]];
+        this.lineIndex = 0;
         const nextWord = this.getRandomWord();
-        global.io.to(this.gameId).emit('next word', nextWord);
+        global.io.to(this.gameId).emit('next word', nextWord, this.currentRound);
     }
 
     correctGuess(socketId) {

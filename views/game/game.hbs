@@ -6,6 +6,7 @@
     {{/each}}
 </ul>
 <button id="ready">Ready?</button>
+<h4>Time Left: <span id="timer"></span></h4>
 <h4>Current Word: <span id="current-word"></span></h4>
 <canvas id="game-canvas"></canvas>
 <div>
@@ -19,5 +20,9 @@
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="../socket.io/socket.io.js"></script>
 
+<script>
+    const gameId = '{{gameId}}';
+    const userId = '{{currentUser._id}}';
+</script>
 <script src="/js/service.js"></script>
 <script src="/js/game-ui.js"></script>
