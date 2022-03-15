@@ -5,6 +5,9 @@
 
     <h3>Your drawings:</h3>
     <div id="drawing-album">
+        <div id="overlay">
+            <img id="expanded-img" src="" alt="">
+        </div>
         {{#each userDrawings}}
             <figure class="drawing-card">
                 <img class="drawing" src="{{url}}" alt="user drawing of {{word}}">
@@ -19,19 +22,10 @@
                     </form>
                     {{else}}
                     {{/unless}}
-
                 </div>
             </figure>
-
         {{/each}}
     </div>
     
-    <script>
-        document.querySelectorAll('.delete-button').forEach(button => {
-        button.onclick = () => confirm('Do you really want to delete this drawing? It can\'t be undone.')
-        });
-        document.querySelectorAll('.publish-button').forEach(button => {
-        button.onclick = () => confirm('Do you really want to publish this drawing? It can\'t be undone.')
-        });
-    </script>
+    <script src="/js/profile.js"></script>
 </div>
