@@ -37,6 +37,7 @@ const drawLineToPoint = (fromPosition, toPosition) => {
 
 const drawFromPlayerInput = (event) => {
     if(penDown) {
+        // console.log(event.offsetX, event.offsetY);
         const { offsetX, offsetY } = event;
         const toPosition = {
             x: offsetX,
@@ -59,27 +60,34 @@ const drawFromPlayerInput = (event) => {
 };
 
 const setCanvasInteraction = () => {
-    window.onmousedown = (event) => {
+    canvas.onmousedown = (event) => {
         penDown = true;
         drawFromPlayerInput(event);
     };
     
-    window.onmouseup = () => {
+    canvas.onmouseup = () => {
         penDown = false;
         lastDrawPosition = null;
         socket.emit('line stop');
         console.log('emit line stop');
     };
     
-    window.onmousemove = (event) => {
+    canvas.onmousemove = (event) => {
         drawFromPlayerInput(event);
     };
+
+    canvas.onmouseout = () => {
+        penDown = false;
+        lastDrawPosition = null;
+        socket.emit('line stop');
+        console.log('emit line stop');
+    }
 };
 
 const clearCanvasInteraction = () => {
-    window.onmousedown = null;
-    window.onmouseup = null;
-    window.onmousemove = null;
+    canvas.onmousedown = null;
+    canvas.onmouseup = null;
+    canvas.onmousemove = null;
 };
 
 const drawFromUpdate = (toPosition) => {
