@@ -5,10 +5,12 @@
         <li>{{username}} – {{points}} Points</li>
     {{/each}}
 </ul>
+<button id="ready">Ready?</button>
+<h4>Time Left: <span id="timer"></span></h4>
 <h4>Current Word: <span id="current-word"></span></h4>
 <canvas id="game-canvas"></canvas>
 <div>
-    <input type="text" name="answer" id="answer" placeholder="Type here...">
+    <input type="text" name="answer" id="answer" value="" placeholder="Type here...">
 </div>
 
 <a id="leave-game" href="/game/matchlist">Leave the game</a>
@@ -18,5 +20,9 @@
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="../socket.io/socket.io.js"></script>
 
-<script src="/js/service.js"></script>
+<script>
+    const gameId = '{{gameId}}';
+    const userId = '{{currentUser._id}}';
+</script>
 <script src="/js/game-ui.js"></script>
+<script src="/js/socket-listeners.js"></script>

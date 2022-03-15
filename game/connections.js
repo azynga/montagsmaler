@@ -1,44 +1,58 @@
-module.exports = (gameId, userId) => {
+module.exports = (io) => {
     
     const { allGames } = require('./game');
-    const io = require('../server');
+    const Drawing = require('../models/User.model');
+
 
     io.on('connection', socket => {
         
-        const game = allGames[gameId];
-        // const player = game.players.find(player => player.userId === userId);
-        
-        // player.socketId = socket.id;
-
-        // socket.to(gameId).emit('playerlist changed', game.players);
-        
-        socket.on('disconnect', () => {
-            console.log('user disconnected');
-            game.removePlayer(userId);
-            // socket.to(gameId).emit('playerlist changed', game.players);
-        });
-        
-        if(game) {
-            socket.join(gameId);
+        socket.on('join game', (gameId, userId) => {
             console.log('user connected');
-            // console.log(io.sockets.adapter.rooms);
-            
+            socket.join(gameId);
+
+            const game = allGames[gameId];
+            const players = game.players;
+            const connectedPlayer = players.find(player => player.userId === userId);
+            if(connectedPlayer.socketId) {
+                socket.emit('reconnect', game);
+            };
+            connectedPlayer.socketId = socket.id;
+
+      
+            socket.on('leave game', () => {
+                game.removePlayer(userId);
+            });
+      
             socket.on('drawing', (toPosition) => {
                 console.log('server received the drawing data');
                 socket.broadcast.to(gameId).emit('drawing update', toPosition);
+                const currentLine = game.drawingData[game.lineIndex];
+                currentLine.push(toPosition);
             });
         
             socket.on('line stop', () => {
-                socket.broadcast.to(gameId).emit('line stop');
+                socket.broadcast.to(game.gameId).emit('line stop');
+                game.drawingData.push([]);
+                game.lineIndex += 1;
                 console.log(game.players);
                 console.log(socket.id);
+                console.log(game.drawingData)
             });
+
+            socket.on('player ready', () => {
+                game.playerIsReady(socket.id);
+            });
+
+            socket.on('correct guess', () => {
+                game.correctGuess(socket.id);
+            });
+
+        });
         
-        } else {
-            socket.disconnect();
-            console.log('server forced disconnect. game does not exist.')
-        };
-        
+        socket.on('disconnect', () => {
+            console.log('user disconnected');
+        });
+
     });
 
 };

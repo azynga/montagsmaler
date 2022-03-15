@@ -9,10 +9,8 @@ const server = app.listen(PORT, () => {
   console.log(`Server listening on port http://localhost:${PORT}`);
 });
 
-const io = socket(server);
+global.io = socket(server);
 
+const connectGame = require('./game/connections');
 
-
-// setInterval(() => console.log(io.sockets.adapter.rooms.entries()), 1000)
-
-module.exports = io;
+connectGame(global.io);

@@ -1,118 +1,129 @@
 
-const axios = require('axios');
-
 const User = require('../models/User.model');
-const connectSocket = require('./connections');
+const wordsCollection = require('../data/words.json');
+
+const wordsList = Object.keys(wordsCollection);
 const allGames = {};
+const usersInGames = {};
 
 class Game {
     constructor() {
         this.gameId = Date.now().toString(36);
         this.players = [];
-        this.currentDrawingData = {};
-        this.roundTimeLeft = 120;
-        this.drawingPlayerIndex = 0;
-        this.timer = null;
-        this.activeRound = false;
-        this.nextWords = this.getFirstWords();
-    }
-
-    connect(userId) {
-        if(!this.players.some(player => player.userId === userId)) {
-            this.addPlayer(userId);
-            connectSocket(this.gameId, userId);
-        } else {
-            console.log('connection rejected. user is already connected')
-        };
+        this.roundTime = 120;
+        this.secondsLeft = this.roundTime;
+        this.rounds = 2;
+        this.currentRound = 0;
+        this.timerId = null;
+        this.inProgress = false;
+        this.drawingData = [[]];
+        this.lineIndex = 0;
     }
 
     addPlayer(userId) {
-        const playerAlreadyInGame = this.players.some(player => player.userId === userId);
-        if(!playerAlreadyInGame) {
+        if(!usersInGames[userId]) {
+            usersInGames[userId] = this.gameId;
             User.findById(userId)
                 .then(user => {
                     this.players.push({
                         username: user.username,
                         userId,
-                        points: 0
+                        points: 0,
+                        isReady: false,
+                        drawingRoundsCount: 0
                     });
-                });
+                    setTimeout(() => {
+                        global.io.to(this.gameId).emit('playerlist change', this.players);
+                    }, 200);
+                }); 
         };
     }
 
     removePlayer(userId) {
         this.players = this.players.filter(player => player.userId !== userId);
+        delete usersInGames[userId];
+        if(this.players.length <= 0) {
+            delete allGames[this.gameId];
+        } else {
+            setTimeout(() => {
+                global.io.to(this.gameId).emit('playerlist change', this.players);
+                console.log('emit playerlist change');
+                // console.log(this.players);
+            }, 200);
+        };
+    }
+
+    endGame() {
+        this.inProgress = false;
+        global.io.to(this.gameId.emit('end game', this.players));
     }
 
     getRandomWord() {
-        const alphabet = 'abcdefghijklmnopqrstuvwxyz';
-        const letterIndex = Math.floor(Math.random() * 26);
-        const randomLetter = alphabet[letterIndex];
-
-        return axios.get(`https://api.datamuse.com/words?sp=*${randomLetter}*&md=pf&max=1000`)
-            .then(response => {
-                const wordList = response.data;
-                const filteredWordList = wordList.filter(wordData => {
-                    const wordFrequency = Number(wordData.tags.find(item => item.startsWith('f:')).slice(2));
-                    return wordData.tags.includes('n') && wordFrequency > 10 && wordData.word.length > 2;
-                });
-                const wordIndex = Math.floor(Math.random() * filteredWordList.length);
-                const randomWord = filteredWordList[wordIndex];
-                return randomWord.word;
-            })
-            .catch(error => console.error(error));
+        const randomIndex = Math.floor(Math.random() * wordsList.length);
+        return wordsList[randomIndex];
     }
 
-    getFirstWords() {
-        const words = []
-        for(let i = 0; i < 3; i ++) {
-            this.getRandomWord()
-                .then(randomWord => {
-                    words.push(randomWord);
-                })
-                .catch(error => console.error(error));
+    playerIsReady(socketId) {
+        const player = this.players.find(player => player.socketId === socketId);
+        // console.log(player);
+        // console.log(socketId);
+        player.isReady = true;
+        if(this.players.length > 1 && this.players.every(player => player.isReady)) {
+            this.startRound();
         };
-        return words;
-    }
-
-    nextWord() {
-        this.currentDrawingData = {};
-        this.nextWords.shift();
-        this.getRandomWord()
-            .then(randomWord => this.nextWords.push(randomWord))
-            .catch(error => console.error(error));
     }
 
     startRound() {
-        this.activeRound = true;
-        this.timer = setInterval(() => {
-            this.roundTimeLeft -= 1;
-            if(this.roundTimeLeft <= 0) {
-                endRound();
+        this.inProgress = true;
+        const drawingPlayer = this.players[0];
+        drawingPlayer.drawingRoundsCount += 1;
+        this.secondsLeft = this.roundTime;
+
+        this.timerId = setInterval(() => {
+            this.secondsLeft -= 1;
+            if(this.secondsLeft <= 0) {
+                this.endRound();
             };
         }, 1000);
+
+        this.nextWord();
+
+        this.currentRound += 1;
+
+        global.io.to(this.gameId).emit('start round', drawingPlayer.userId);
     }
 
     endRound() {
-        this.activeRound = false;
-        clearInterval(this.timer);
-        const playerCount = this.players.length;
-        this.drawingPlayerIndex = (this.drawingPlayerIndex + 1) % playerCount;
+        clearInterval(this.timerId);
+        this.players.push(this.players.shift());
+        if(this.players[0].drawingRoundsCount > this.rounds) {
+            this.endGame();
+        };
+        this.players.forEach(player => player.isReady = false);
+        global.io.to(this.gameId).emit('end round');
     }
 
-    correctGuess(userId) {
-        const guessingPlayer = this.players.find(player => player.userId === userId);
-        const drawingPlayer = this.players[this.drawingPlayerIndex];
+    nextWord() {
+        this.drawingData = [[]];
+        this.lineIndex = 0;
+        const nextWord = this.getRandomWord();
+        global.io.to(this.gameId).emit('next word', nextWord, this.currentRound);
+    }
+
+    correctGuess(socketId) {
+        const guessingPlayer = this.players.find(player => player.socketId === socketId);
+        const drawingPlayer = this.players[0];
 
         guessingPlayer.points += 1;
         drawingPlayer.points += 1;
 
-        this.currentDrawingData = {};
+        global.io.to(this.gameId).emit('playerlist change', this.players);
         this.nextWord();
     }
 };
 
 module.exports = {
     allGames,
+    usersInGames,
     Game
 };

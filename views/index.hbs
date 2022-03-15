@@ -1,2 +1,12 @@
 <h1>Homepage</h1>
+<div id="container">
+<div id="drawing-album">
+{{#each drawings}}
+        <figure class="drawing-card">
+            <img class="drawing" src="{{url}}" alt="user drawing of {{word}}">
+            <figcaption>{{word}}, {{creator.username}}</figcaption>
+        </figure>
 
+{{/each}}
+</div>
+</div>

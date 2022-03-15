@@ -1,10 +1,31 @@
 <h1>{{currentUser.username}}'s page</h1>
-<div id="container">
-<a href="/user/settings" style="color:black">Click here to edit your account details</a>
 
-{{#each currentUser.highlights}}
-    <div class="card">
-        <img src="{{url}}" alt="user drawing of {{word}}">
+<div id="container">
+    <a href="/user/settings" style="color:black">Click here to edit your account details</a>
+
+    <h3>Your drawings:</h3>
+    <div id="drawing-album">
+        <div id="overlay">
+            <img id="expanded-img" src="" alt="">
+        </div>
+        {{#each userDrawings}}
+            <figure class="drawing-card">
+                <img class="drawing" src="{{url}}" alt="user drawing of {{word}}">
+                <figcaption>{{word}}</figcaption>
+                <div class="button-div">
+                    <form action="/user/profile/drawing/{{this._id}}/delete" method="post">
+                        <button class="delete-button">Delete</button>
+                    </form>
+                    {{#unless isPublic}}
+                    <form action="/user/profile/drawing/{{this._id}}/publish" method="post">
+                        <button class="publish-button">Publish</button>
+                    </form>
+                    {{else}}
+                    {{/unless}}
+                </div>
+            </figure>
+        {{/each}}
     </div>
-{{/each}}
+    
+    <script src="/js/profile.js"></script>
 </div>
