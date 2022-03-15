@@ -9,8 +9,29 @@
             <figure class="drawing-card">
                 <img class="drawing" src="{{url}}" alt="user drawing of {{word}}">
                 <figcaption>{{word}}</figcaption>
+                <div class="button-div">
+                    <form action="/user/profile/drawing/{{this._id}}/delete" method="post">
+                        <button class="delete-button">Delete</button>
+                    </form>
+                    {{#unless isPublic}}
+                    <form action="/user/profile/drawing/{{this._id}}/publish" method="post">
+                        <button class="publish-button">Publish</button>
+                    </form>
+                    {{else}}
+                    {{/unless}}
+
+                </div>
             </figure>
+
         {{/each}}
     </div>
-
+    
+    <script>
+        document.querySelectorAll('.delete-button').forEach(button => {
+        button.onclick = () => confirm('Do you really want to delete this drawing? It can\'t be undone.')
+        });
+        document.querySelectorAll('.publish-button').forEach(button => {
+        button.onclick = () => confirm('Do you really want to publish this drawing? It can\'t be undone.')
+        });
+    </script>
 </div>
