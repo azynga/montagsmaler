@@ -5,12 +5,27 @@
 
     <h3>Your drawings:</h3>
     <div id="drawing-album">
+        <div id="overlay">
+            <img id="expanded-img" src="" alt="">
+        </div>
         {{#each userDrawings}}
             <figure class="drawing-card">
                 <img class="drawing" src="{{url}}" alt="user drawing of {{word}}">
                 <figcaption>{{word}}</figcaption>
+                <div class="button-div">
+                    <form action="/user/profile/drawing/{{this._id}}/delete" method="post">
+                        <button class="delete-button">Delete</button>
+                    </form>
+                    {{#unless isPublic}}
+                    <form action="/user/profile/drawing/{{this._id}}/publish" method="post">
+                        <button class="publish-button">Publish</button>
+                    </form>
+                    {{else}}
+                    {{/unless}}
+                </div>
             </figure>
         {{/each}}
     </div>
-
+    
+    <script src="/js/profile.js"></script>
 </div>

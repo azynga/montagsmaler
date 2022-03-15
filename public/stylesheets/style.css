@@ -141,3 +141,22 @@ form {
   background-color: hsl(0, 0%, 70%);
   opacity: 0.5;
 }
+
+.overlay {
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0,0,0,0.5)
+}
+
+#expanded-img {
+  position: absolute;
+  background-color:white;
+  margin-left:auto;
+  margin-right: auto;
+}
