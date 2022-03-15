@@ -35,10 +35,14 @@ router.get('/settings', isLoggedIn, (req, res, next) => {
 
 // Post requests
 
-router.post('/profile/drawing/:id/delete', (req, res, next) => {
-  const { id } = req.params;
-  console.log(id);
-  Drawing.findByIdAndRemove(id)
+router.post('/profile/drawing/:drawingId/delete', (req, res, next) => {
+  const { drawingId } = req.params;
+  const { currentUser } = req.session;
+  // console.log(id);
+  User.findOneAndUpdate({ username: currentUser.username}, { $pull: { drawings: drawingId }})
+    .then(user => console.log('Drawing deleted from user'))
+    .catch(error => console.log(error));
+  Drawing.findByIdAndRemove(drawingId)
     .then(deletedDrawing => {
       // console.log(deletedDrawing)
       res.redirect('/user/profile')
