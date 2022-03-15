@@ -9,10 +9,15 @@ module.exports = (io) => {
         socket.on('join game', (gameId, userId) => {
             console.log('user connected');
             socket.join(gameId);
+
             const game = allGames[gameId];
             const players = game.players;
             const connectedPlayer = players.find(player => player.userId === userId);
+            if(connectedPlayer.socketId) {
+                socket.emit('reconnect', game);
+            };
             connectedPlayer.socketId = socket.id;
+
       
             socket.on('leave game', () => {
                 game.removePlayer(userId);

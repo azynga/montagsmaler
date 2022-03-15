@@ -11,9 +11,11 @@ class Game {
         this.gameId = Date.now().toString(36);
         this.players = [];
         this.roundTime = 120;
+        this.secondsLeft = this.roundTime;
+        this.rounds = 2;
         this.currentRound = 0;
         this.timerId = null;
-        this.activeRound = false;
+        this.inProgress = false;
         this.drawingData = [[]];
         this.lineIndex = 0;
     }
@@ -27,12 +29,11 @@ class Game {
                         username: user.username,
                         userId,
                         points: 0,
-                        isReady: false
+                        isReady: false,
+                        drawingRoundsCount: 0
                     });
                     setTimeout(() => {
-                        global.io.to(this.gameId).emit('playerlist change', this.players)
-                        console.log('emit playerlist change')
-                        console.log(this.players)
+                        global.io.to(this.gameId).emit('playerlist change', this.players);
                     }, 200);
                 }); 
         };
@@ -52,6 +53,11 @@ class Game {
         };
     }
 
+    endGame() {
+        this.inProgress = false;
+        global.io.to(this.gameId.emit('end game', this.players));
+    }
+
     getRandomWord() {
         const randomIndex = Math.floor(Math.random() * wordsList.length);
         return wordsList[randomIndex];
@@ -68,13 +74,14 @@ class Game {
     }
 
     startRound() {
+        this.inProgress = true;
         const drawingPlayer = this.players[0];
-        let secondsLeft = this.roundTime;
-        this.activeRound = true;
+        drawingPlayer.drawingRoundsCount += 1;
+        this.secondsLeft = this.roundTime;
 
         this.timerId = setInterval(() => {
-            secondsLeft -= 1;
-            if(secondsLeft <= 0) {
+            this.secondsLeft -= 1;
+            if(this.secondsLeft <= 0) {
                 this.endRound();
             };
         }, 1000);
@@ -87,9 +94,11 @@ class Game {
     }
 
     endRound() {
-        this.activeRound = false;
         clearInterval(this.timerId);
         this.players.push(this.players.shift());
+        if(this.players[0].drawingRoundsCount > this.rounds) {
+            this.endGame();
+        };
         this.players.forEach(player => player.isReady = false);
         global.io.to(this.gameId).emit('end round');
     }
