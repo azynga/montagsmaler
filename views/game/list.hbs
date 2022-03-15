@@ -6,7 +6,7 @@
 
     <ul id="game-list">
         {{#each allGames}}
-            <li class="game">
+            <li class="game" id="{{gameId}}">
                 <a href="/game/{{gameId}}">
                     <h3>Game Nr. {{@index}}</h3>
                     <p>Current players: {{players.length}}</p>
@@ -16,4 +16,8 @@
         {{/each}}
     </ul>
 
+    <script>
+        const userGameId = '{{userGameId}}';
+        document.getElementById(userGameId).classList.add('usergame');
+    </script>
 </div>

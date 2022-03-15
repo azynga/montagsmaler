@@ -20,7 +20,7 @@ class Game {
 
     addPlayer(userId) {
         if(!usersInGames[userId]) {
-            usersInGames[userId] = true;
+            usersInGames[userId] = this.gameId;
             User.findById(userId)
                 .then(user => {
                     this.players.push({
