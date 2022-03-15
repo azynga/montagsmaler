@@ -111,6 +111,11 @@ class Game {
         global.io.to(this.gameId).emit('playerlist change', this.players);
         this.nextWord();
     }
+    endGame() {
+        //rules to end game
+        //send points
+        //create overlay div when game ends
+    }
 };
 
 module.exports = {
