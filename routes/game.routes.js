@@ -40,6 +40,8 @@ router.get('/:gameId', (req, res) => {
         res.send('Woops! This game ID was not found. <a href="/game/matchlist">Back to list of games</a>');
     } else if(usersInGames[userId] && !game.players.some(player => player.userId === userId)) {
         res.send('Woops! Looks like you\'re already in a game. <a href="/game/matchlist">Back to list of games</a>');
+    } else if(game.inProgress && !game.players.some(player => player.userId === userId)) {
+        res.send('This game is already in progress. You cannot join in the middle of the game. <a href="/game/matchlist">Back to list of games</a>');
     } else {
         game.addPlayer(userId);
         const players = game.players;
