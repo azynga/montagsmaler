@@ -1,5 +1,17 @@
-socket.on('reconnect', (game) => {
-    getCurrentGameState(game);
+socket.on('reconnect', (gameData) => {
+    const {
+        drawingData,
+        drawingPlayerId,
+        currentWord: currentWordFromServer,
+        secondsLeft,
+        activeRound
+    } = gameData;
+
+    console.log(gameData)
+    drawFromData(drawingData);
+    currentWord = currentWordFromServer;
+    setTimerDisplay(secondsLeft);
+    setUi(drawingPlayerId, activeRound);
 });
 
 socket.on('drawing update', (toPosition) => {
@@ -16,14 +28,14 @@ socket.on('playerlist change', (players) => {
     playerList.textContent = '';
     players.forEach(player => {
         const newPlayer = document.createElement('li');
-        newPlayer.textContent = `${player.username} – ${player.points} Points`;
+        newPlayer.textContent = `${player.username}: ${player.points} Points`;
         playerList.appendChild(newPlayer);
     });
 });
 
-socket.on('next word', (word, currentRound) => {
+socket.on('next word', (currentWordFromServer, currentRound) => {
     console.log('received next word')
-    if(isDrawingPlayer && currentRound > 0) {
+    if(drawingPlayerId === userId && currentRound > 0) {
 
         axios.post(`/game/${gameId}/drawing-store`, {
             creator: userId,
@@ -34,41 +46,27 @@ socket.on('next word', (word, currentRound) => {
         
     };
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    currentWord = word;
-    currentWordDisplay.textContent = currentWord;
+    currentWord = currentWordFromServer;
+    console.log(drawingPlayerId);
+    console.log(userId)
+    console.log(currentWord)
+    if(drawingPlayerId === userId) {
+        currentTaskDisplay.textContent = `Draw '${currentWord}'!`;
+    }
 });
 
-socket.on('start round', (drawingPlayerId) => {
+socket.on('start round', (drawingPlayerIdFromServer) => {
+    drawingPlayerId = drawingPlayerIdFromServer;
+    setUi(drawingPlayerId, true);
+});
 
-    readyButton.style.visibility = 'hidden';
-    timer.textContent = 120;
-
-    timerId = setInterval(() => {
-        timer.textContent -= 1;
-        if(timer.textContent <= 0) {
-            clearInterval(timerId);
-        };
-    }, 1000);
-
-    if(drawingPlayerId === userId) {
-        isDrawingPlayer = true;
-        setCanvasInteraction();
-        currentWordDisplay.textContent = currentWord;
-        currentWordDisplay.style.visibility = 'visible';
-        answerInput.disabled = true;
-        // showWordDisplay();
-        // hideInput();
-    } else {
-        isDrawingPlayer = false;
-        clearCanvasInteraction();
-        currentWordDisplay.style.visibility = 'hidden';
-        answerInput.disabled = false;
-        // hideWordDisplay();
-        // showInput();
-    };
+socket.on('tick', secondsLeft => {
+    roundInProgress = true;
+    setTimerDisplay(secondsLeft);
 });
 
 socket.on('end round', () => {
+    roundInProgress = false;
     readyButton.style.visibility = 'visible';
     clearCanvasInteraction();
 });
