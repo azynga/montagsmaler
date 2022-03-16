@@ -18,6 +18,8 @@ class Game {
         this.inProgress = false;
         this.drawingData = [[]];
         this.lineIndex = 0;
+        this.currentWord = null;
+        this.activeRound = false;
     }
 
     addPlayer(userId) {
@@ -55,7 +57,7 @@ class Game {
 
     endGame() {
         this.inProgress = false;
-        global.io.to(this.gameId.emit('end game', this.players));
+        global.io.to(this.gameId).emit('end game', this.players);
     }
 
     getRandomWord() {
@@ -68,19 +70,24 @@ class Game {
         // console.log(player);
         // console.log(socketId);
         player.isReady = true;
-        if(this.players.length > 1 && this.players.every(player => player.isReady)) {
+        if(this.players.length > 1 && this.players.every(player => player.isReady) && !this.activeRound) {
             this.startRound();
         };
     }
 
     startRound() {
         this.inProgress = true;
+        this.activeRound = true;
+
         const drawingPlayer = this.players[0];
         drawingPlayer.drawingRoundsCount += 1;
         this.secondsLeft = this.roundTime;
 
+        global.io.emit('tick', this.secondsLeft);
+
         this.timerId = setInterval(() => {
             this.secondsLeft -= 1;
+            global.io.emit('tick', this.secondsLeft);
             if(this.secondsLeft <= 0) {
                 this.endRound();
             };
@@ -95,6 +102,7 @@ class Game {
 
     endRound() {
         clearInterval(this.timerId);
+        this.activeRound = false;
         this.players.push(this.players.shift());
         if(this.players[0].drawingRoundsCount > this.rounds) {
             this.endGame();
@@ -106,8 +114,8 @@ class Game {
     nextWord() {
         this.drawingData = [[]];
         this.lineIndex = 0;
-        const nextWord = this.getRandomWord();
-        global.io.to(this.gameId).emit('next word', nextWord, this.currentRound);
+        this.currentWord = this.getRandomWord();
+        global.io.to(this.gameId).emit('next word', this.currentWord, this.currentRound);
     }
 
     correctGuess(socketId) {
