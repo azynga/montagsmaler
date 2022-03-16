@@ -2,12 +2,14 @@
 <h3>Players: </h3>
 <ul id="player-list">
     {{#each players}}
-        <li>{{username}} – {{points}} Points</li>
+        <li>{{username}}: {{points}} Points</li>
     {{/each}}
 </ul>
 <button id="ready">Ready?</button>
-<h4>Time Left: <span id="timer"></span></h4>
-<h4>Current Word: <span id="current-word"></span></h4>
+<h4 id="timer"></h4>
+<h4 id="current-task"></h4>
+<button class="button" id="skip">Skip word (-1 Point)</button>
+
 <canvas id="game-canvas"></canvas>
 <div>
     <input type="text" name="answer" id="answer" value="" placeholder="Type here...">
