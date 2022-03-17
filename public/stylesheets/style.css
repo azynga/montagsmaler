@@ -95,7 +95,7 @@ form {
   padding: 3px;
   border-radius: 3px;
   text-align: center;
-  transition-duration: 0.3s;
+  /* transition-duration: 0.3s; */
 }
 
 .game:hover .button {
@@ -147,6 +147,10 @@ form {
 
 #score-screen{
   position: fixed;
+}
+
+#skip {
+  visibility: hidden;
 }
 
 .overlay {
