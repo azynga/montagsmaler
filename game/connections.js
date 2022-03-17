@@ -71,8 +71,7 @@ module.exports = (io) => {
                     player.points -= 1;
                     global.io.emit('playerlist change', players)
                     game.nextWord();
-                })
-
+                });
             } else {
                 console.log('Forced disconnect. Game does not exist.')
                 socket.disconnect();
