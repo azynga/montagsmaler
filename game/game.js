@@ -50,7 +50,6 @@ class Game {
             setTimeout(() => {
                 global.io.to(this.gameId).emit('playerlist change', this.players);
                 console.log('emit playerlist change');
-                // console.log(this.players);
             }, 200);
         };
     }
@@ -67,8 +66,6 @@ class Game {
 
     playerIsReady(socketId) {
         const player = this.players.find(player => player.socketId === socketId);
-        // console.log(player);
-        // console.log(socketId);
         player.isReady = true;
         if(this.players.length > 1 && this.players.every(player => player.isReady) && !this.activeRound) {
             this.startRound();

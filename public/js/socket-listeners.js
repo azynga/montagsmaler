@@ -9,7 +9,6 @@ socket.on('reconnect', (gameData) => {
         activeRound
     } = gameData;
 
-    console.log(gameData)
     drawFromData(drawingData);
     currentWord = currentWordFromServer;
     setTimerDisplay(secondsLeft);
@@ -49,9 +48,7 @@ socket.on('next word', (currentWordFromServer, currentRound) => {
     };
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     currentWord = currentWordFromServer;
-    console.log(drawingPlayerId);
-    console.log(userId)
-    console.log(currentWord)
+    
     if(drawingPlayerId === userId) {
         currentTaskDisplay.textContent = `Draw '${currentWord}'!`;
     }

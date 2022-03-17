@@ -25,8 +25,6 @@ module.exports = (io) => {
                         activeRound
                     } = game;
 
-                    console.log(activeRound);
-
                     const gameData = {
                         drawingData,
                         currentWord,
@@ -35,7 +33,6 @@ module.exports = (io) => {
                         drawingPlayerId
                     };
 
-                    console.log(gameData)
                     socket.emit('reconnect', gameData);
                 }
             
@@ -57,7 +54,6 @@ module.exports = (io) => {
                     socket.broadcast.to(game.gameId).emit('line stop');
                     game.drawingData.push([]);
                     game.lineIndex += 1;
-                    console.log(game.drawingData)
                 });
     
                 socket.on('player ready', () => {

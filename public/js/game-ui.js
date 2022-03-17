@@ -65,7 +65,6 @@ const drawLineToPoint = (fromPosition, toPosition) => {
 
 const drawFromPlayerInput = (event) => {
     if (penDown) {
-        // console.log(event.offsetX, event.offsetY);
         const { offsetX, offsetY } = event;
         const toPosition = {
             x: offsetX,
@@ -93,6 +92,8 @@ const setUi = (drawingPlayerId, activeRound) => {
         isDrawingPlayer = false;
         clearCanvasInteraction();
         changeVisibility('answer', true);
+        changeVisibility('timer', true);
+        changeVisibility('current-task', true);
         currentTaskDisplay.textContent = `Guess the word!`;
         answerInput.disabled = false;
         changeVisibility('skip', false);
@@ -101,10 +102,13 @@ const setUi = (drawingPlayerId, activeRound) => {
     const setDrawingUi = () => {
         isDrawingPlayer = true;
         setCanvasInteraction();
+        changeVisibility('current-task', true);
         changeVisibility('answer', false);
         currentTaskDisplay.textContent = `Draw '${currentWord}'!`;
         answerInput.disabled = true;
         changeVisibility('skip', true);
+        changeVisibility('timer', true);
+
     };
 
     const setClearUi = () => {
@@ -112,6 +116,8 @@ const setUi = (drawingPlayerId, activeRound) => {
         clearCanvasInteraction();
         changeVisibility('answer', false);
         changeVisibility('skip', false);
+        changeVisibility('timer', false);
+        changeVisibility('current-task', false);
         changeVisibility('ready', true);
     }
 
@@ -175,7 +181,10 @@ const setEndGameUi = (players) => {
     scoreScreen.classList.add('overlay');
 
     // changeVisibility('restart', true);
-    playAgainButton.onclick = () => scoreScreen.remove();
+    playAgainButton.onclick = () => {
+        scoreScreen.remove();
+        setUi();
+    };
     leaveGameButton.onclick = () => socket.emit('leave game');
 };
 
@@ -246,7 +255,6 @@ answerInput.addEventListener('keydown', (event) => {
 });
 
 const sortByPoints = (players) => {
-    // console.log(players)
     return players.sort((a, b) => b.points - a.points);
     return sortedPlayers
 };
