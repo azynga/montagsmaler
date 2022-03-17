@@ -1,12 +1,21 @@
 <h1>Homepage</h1>
 <div id="container">
-<div id="drawing-album">
-{{#each drawings}}
-        <figure class="drawing-card">
-            <img class="drawing" src="{{url}}" alt="user drawing of {{word}}">
-            <figcaption>{{word}}, {{creator.username}}</figcaption>
-        </figure>
+    <div id="drawing-album">
+    {{#each drawings}}
+            <figure class="drawing-card">
+                <img class="drawing" src="{{url}}" alt="user drawing of {{word}}">
+                <figcaption>{{word}}, {{creator.username}}</figcaption>
+            </figure>
 
-{{/each}}
+    {{/each}}
+    </div>
 </div>
-</div>
+
+<script>
+    const drawingCards = document.querySelectorAll('.drawing-card');
+    drawingCards.forEach(drawingCard => {
+        const randomHue = Math.floor(Math.random() * 360);
+        const hsl = `hsl(${randomHue}, 70%, 80%)`;
+        drawingCard.style.backgroundColor = hsl;
+    });
+</script>
