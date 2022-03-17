@@ -10,11 +10,24 @@ const { isLoggedIn } = require('../middleware/route-guard.js');
 
 router.get('/matchlist', isLoggedIn, (req, res, next) => {
     if(req.session){
-        const {currentUser} = req.session;
+        const { currentUser } = req.session;
         const userId = currentUser['_id'];
         const userGameId = usersInGames[userId];
         res.render('game/list', { allGames, currentUser, userGameId });
     }
+});
+
+router.get('/matchlist/data', (req, res) => {
+    const { currentUser } = req.session;
+    const userId = currentUser['_id'];
+    const userGameId = usersInGames[userId];
+    const gamesInfo = {};
+    for(let game in allGames) {
+        const { inProgress, players, gameId } = allGames[game];
+        const isUserGame = gameId === userGameId;
+        gamesInfo[game] = { inProgress, players, gameId, isUserGame };
+    };
+    res.send({ gamesInfo });
 });
 
 router.get('/create', (req, res) => {
