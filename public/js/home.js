@@ -14,11 +14,3 @@ document.querySelectorAll('.drawing').forEach(drawing => {
         expandedImg.alt = '';
     };
 });
-// Delete button
-document.querySelectorAll('.delete-button').forEach(button => {
-    button.onclick = () => confirm('Do you really want to delete this drawing? It can\'t be undone.')
-});
-// Publish button
-document.querySelectorAll('.publish-button').forEach(button => {
-    button.onclick = () => confirm('Do you really want to publish this drawing? It can\'t be undone.')
-});

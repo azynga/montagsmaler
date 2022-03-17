@@ -146,6 +146,10 @@ form {
   position: fixed;
 }
 
+#score-screen{
+  position: fixed;
+}
+
 .overlay {
   top: 0;
   left: 0;
