@@ -2,6 +2,10 @@
 {{#if drawings}}
 <div id="container">
 <div id="drawing-album">
+    <div id="drawing-album">
+        <div id="overlay">
+            <img id="expanded-img" src="" alt="">
+        </div>
 {{#each drawings}}
         <figure class="drawing-card">
             <img class="drawing" src="{{url}}" alt="user drawing of {{word}}">
@@ -12,3 +16,5 @@
 {{/if}}
 </div>
 </div>
+</div>
+<script src="/js/home.js"></script>
