@@ -25,6 +25,8 @@ module.exports = (io) => {
                         activeRound
                     } = game;
 
+                    console.log(activeRound);
+
                     const gameData = {
                         drawingData,
                         currentWord,
@@ -35,7 +37,8 @@ module.exports = (io) => {
 
                     console.log(gameData)
                     socket.emit('reconnect', gameData);
-                };
+                }
+            
                 connectedPlayer.socketId = socket.id;
     
           

@@ -1,3 +1,5 @@
+socket.on('connect',() => setUi())
+
 socket.on('reconnect', (gameData) => {
     const {
         drawingData,

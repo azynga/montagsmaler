@@ -107,21 +107,30 @@ const setUi = (drawingPlayerId, activeRound) => {
         changeVisibility('skip', true);
     };
 
+    const setClearUi = () => {
+        isDrawingPlayer = false;
+        clearCanvasInteraction();
+        changeVisibility('answer', false);
+        changeVisibility('skip', false);
+        changeVisibility('ready', true);
+    }
 
     if (activeRound) {
         changeVisibility('ready', false);
+        if (drawingPlayerId === userId) {
+            setDrawingUi();
+        }else {
+            setGuessingUi();
+        };
     } else {
-        changeVisibility('ready', true);
+        setClearUi();
     };
 
-    if (drawingPlayerId === userId) {
-        setDrawingUi();
-    } else {
-        setGuessingUi();
-    };
-    // if(gameOver) {
-    //     setEndGameUi();
-    // }
+    // if (drawingPlayerId === userId) {
+    //     setDrawingUi();
+    // } else {
+    //     setGuessingUi();
+    // };
 };
 
 const setEndGameUi = (players) => {
@@ -152,7 +161,7 @@ const setEndGameUi = (players) => {
     const leaveGameButton = document.createElement('a');
 
     leaveGameButton.href = `${location.origin}`;
-    
+
     playAgainButton.id = 'restart';
     playAgainButton.classList.add('button');
     playAgainButton.innerText = 'Play Again';
@@ -204,11 +213,11 @@ const clearCanvasInteraction = () => {
 
 const drawFromUpdate = (toPosition) => {
     let fromPosition = lastDrawPosition;
-    
+
     if (!fromPosition) {
         fromPosition = toPosition;
     };
-    
+
     drawLineToPoint(fromPosition, toPosition);
     lastDrawPosition = toPosition;
 };
@@ -239,7 +248,7 @@ answerInput.addEventListener('keydown', (event) => {
 const sortByPoints = (players) => {
     // console.log(players)
     return players.sort((a, b) => b.points - a.points);
-        return sortedPlayers
+    return sortedPlayers
 };
 
 
