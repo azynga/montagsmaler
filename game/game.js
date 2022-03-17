@@ -10,9 +10,9 @@ class Game {
     constructor() {
         this.gameId = Date.now().toString(36);
         this.players = [];
-        this.roundTime = 120;
+        this.roundTime = 5;
         this.secondsLeft = this.roundTime;
-        this.rounds = 2;
+        this.rounds = 1;
         this.currentRound = 0;
         this.timerId = null;
         this.inProgress = false;
@@ -55,9 +55,9 @@ class Game {
         };
     }
 
-    endGame() {
-        this.inProgress = false;
-        global.io.to(this.gameId).emit('end game', this.players);
+    endGame(players) {
+        global.io.to(this.gameId).emit('end game', players);
+        this.resetGame()
     }
 
     getRandomWord() {
@@ -104,8 +104,9 @@ class Game {
         clearInterval(this.timerId);
         this.activeRound = false;
         this.players.push(this.players.shift());
-        if(this.players[0].drawingRoundsCount > this.rounds) {
-            this.endGame();
+        if(this.players.every(player => player.drawingRoundsCount === this.rounds)) {
+            this.inProgress = false;
+            this.endGame(this.players);
         };
         this.players.forEach(player => player.isReady = false);
         global.io.to(this.gameId).emit('end round');
@@ -127,6 +128,22 @@ class Game {
 
         global.io.to(this.gameId).emit('playerlist change', this.players);
         this.nextWord();
+    }
+
+    resetGame() {
+        this.players.forEach(player => {
+            player.points = 0;
+            player.isReady = false;
+            player.drawingRoundsCount= 0;
+        });
+        this.secondsLeft = this.roundTime;
+        this.currentRound = 0;
+        this.inProgress = false;
+        this.drawingData = [[]];
+        this.lineIndex = 0;
+        this.currentWord = null;
+        this.activeRound = false;
+        global.io.to(this.gameId).emit('playerlist change', this.players);
     }
 };
 

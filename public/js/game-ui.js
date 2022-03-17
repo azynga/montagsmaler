@@ -3,12 +3,15 @@
 const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
 
+const [body] = document.getElementsByTagName('body');
 const playerList = document.getElementById('player-list');
+const scoreScreen = document.getElementById('score-screen');
 const currentTaskDisplay = document.getElementById('current-task');
 const leaveGame = document.getElementById('leave-game');
 const readyButton = document.getElementById('ready');
 const timerDisplay = document.getElementById('timer');
 const skipButton = document.getElementById('skip');
+let isGameOver = false;
 
 canvas.width = 600;
 canvas.height = 600;
@@ -20,6 +23,7 @@ let lastDrawPosition = null;
 let penDown = false;
 let drawingPlayerId = null;
 let roundInProgress = false;
+// let gameOver = false;
 
 socket.emit('join game', gameId, userId);
 
@@ -34,7 +38,7 @@ const setTimerDisplay = (secondsLeft) => {
 
 const changeVisibility = (elementId, changeToVisible) => {
     const element = document.getElementById(elementId);
-    if(changeToVisible) {
+    if (changeToVisible) {
         element.style.visibility = 'visible';
     } else {
         element.style.visibility = 'hidden';
@@ -60,7 +64,7 @@ const drawLineToPoint = (fromPosition, toPosition) => {
 };
 
 const drawFromPlayerInput = (event) => {
-    if(penDown) {
+    if (penDown) {
         // console.log(event.offsetX, event.offsetY);
         const { offsetX, offsetY } = event;
         const toPosition = {
@@ -70,12 +74,12 @@ const drawFromPlayerInput = (event) => {
 
         let fromPosition = lastDrawPosition;
 
-        if(!fromPosition) {
+        if (!fromPosition) {
             fromPosition = toPosition;
         };
-    
+
         drawLineToPoint(fromPosition, toPosition);
-        
+
         socket.emit('drawing', toPosition);
         console.log('emit drawing ');
 
@@ -93,7 +97,7 @@ const setUi = (drawingPlayerId, activeRound) => {
         answerInput.disabled = false;
         changeVisibility('skip', false);
     };
-    
+
     const setDrawingUi = () => {
         isDrawingPlayer = true;
         setCanvasInteraction();
@@ -103,17 +107,67 @@ const setUi = (drawingPlayerId, activeRound) => {
         changeVisibility('skip', true);
     };
 
-    if(activeRound) {
+
+    if (activeRound) {
         changeVisibility('ready', false);
     } else {
         changeVisibility('ready', true);
     };
 
-    if(drawingPlayerId === userId) {
+    if (drawingPlayerId === userId) {
         setDrawingUi();
     } else {
         setGuessingUi();
     };
+    // if(gameOver) {
+    //     setEndGameUi();
+    // }
+};
+
+const setEndGameUi = (players) => {
+    isGameOver = true;
+    console.log('end game function');
+    clearCanvasInteraction();
+
+    const scoreScreen = document.createElement('div');
+    scoreScreen.id = 'overlay';
+
+    body.appendChild(scoreScreen);
+
+    const scoreList = document.createElement('ul');
+    scoreScreen.appendChild(scoreList);
+
+    const sortedPlayers = sortByPoints(players); // There is probably thousand better ways to do this, but I don't know/ am afraid to test
+    const winnerElement = document.createElement('h2');
+    scoreScreen.appendChild(winnerElement);
+    winnerElement.innerText = `${players[0].username} won!`;
+
+    sortedPlayers.forEach(player => {           // Same as above
+        const finalScoreList = document.createElement('li');
+        finalScoreList.innerText = `${player.username}: ${player.points}`;
+        scoreList.appendChild(finalScoreList);
+    });
+
+    const playAgainButton = document.createElement('button');
+    const leaveGameButton = document.createElement('a');
+
+    leaveGameButton.href = `${location.origin}`;
+    
+    playAgainButton.id = 'restart';
+    playAgainButton.classList.add('button');
+    playAgainButton.innerText = 'Play Again';
+    scoreScreen.appendChild(playAgainButton);
+
+    leaveGameButton.id = 'leave-game';
+    leaveGameButton.classList.add('button');
+    leaveGameButton.innerText = 'Leave room';
+    scoreScreen.appendChild(leaveGameButton);
+
+    scoreScreen.classList.add('overlay');
+
+    // changeVisibility('restart', true);
+    playAgainButton.onclick = () => scoreScreen.remove();
+    leaveGameButton.onclick = () => socket.emit('leave game');
 };
 
 
@@ -122,14 +176,14 @@ const setCanvasInteraction = () => {
         penDown = true;
         drawFromPlayerInput(event);
     };
-    
+
     canvas.onmouseup = () => {
         penDown = false;
         lastDrawPosition = null;
         socket.emit('line stop');
         console.log('emit line stop');
     };
-    
+
     canvas.onmousemove = (event) => {
         drawFromPlayerInput(event);
     };
@@ -151,7 +205,7 @@ const clearCanvasInteraction = () => {
 const drawFromUpdate = (toPosition) => {
     let fromPosition = lastDrawPosition;
     
-    if(!fromPosition) {
+    if (!fromPosition) {
         fromPosition = toPosition;
     };
     
@@ -161,19 +215,19 @@ const drawFromUpdate = (toPosition) => {
 
 const answerInput = document.getElementById('answer');
 
-answerInput.addEventListener('keydown', (event) =>{
+answerInput.addEventListener('keydown', (event) => {
     const currentAttempt = answerInput.value;
-    
-    if(currentAttempt.length > 0 && event.key === 'Enter'){
+
+    if (currentAttempt.length > 0 && event.key === 'Enter') {
         answerInput.value = '';
-        
-        if(currentAttempt.toLowerCase() === currentWord.toLowerCase()) {
+
+        if (currentAttempt.toLowerCase() === currentWord.toLowerCase()) {
             answerInput.classList.add('right-answer');
             setTimeout(() => {
                 answerInput.classList.remove('right-answer');
             }, 3000);
             socket.emit('correct guess');
-        } else{
+        } else {
             answerInput.classList.add('wrong-answer');
             setTimeout(() => {
                 answerInput.classList.remove('wrong-answer');
@@ -181,6 +235,14 @@ answerInput.addEventListener('keydown', (event) =>{
         };
     };
 });
+
+const sortByPoints = (players) => {
+    // console.log(players)
+    return players.sort((a, b) => b.points - a.points);
+        return sortedPlayers
+};
+
+
 
 readyButton.onclick = () => socket.emit('player ready');
 

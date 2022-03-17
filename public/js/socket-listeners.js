@@ -71,6 +71,9 @@ socket.on('end round', () => {
     clearCanvasInteraction();
 });
 
-socket.on('end game', () => {
-
+socket.on('end game', (players) => {
+    console.log('received end game');
+    // playAgainButton.style.visibility = 'visible';
+    
+    setEndGameUi(players);
 });
