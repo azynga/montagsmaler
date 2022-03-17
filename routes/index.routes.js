@@ -10,11 +10,9 @@ router.get("/", (req, res, next) => {
   Drawing.find({isPublic: true}).sort({ updatedAt: -1})
   .populate('creator')
   .then(drawings => {
-      // console.log(drawings)
           if(req.session){
           const {currentUser} = req.session
         res.render('index', { currentUser, drawings });
-        // console.log(req.session.currentUser)
       }
       else{
       
