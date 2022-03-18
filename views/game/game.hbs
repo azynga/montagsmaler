@@ -1,26 +1,32 @@
+<div id="container">
+    {{!-- <h2>Your game</h2> --}}
 
-<h3>Players: </h3>
-<div id="game-container">
+    <div id="game-container">
+        <div id="ui-container">
 
+            <div id="players">
+                <h3>Players: </h3>
+                <ul id="player-list">
+                    {{#each players}}
+                        <li>{{username}}: <span class="points">{{points}}</span> Points</li>
+                    {{/each}}
+                </ul>
+                <button class="game-button" id="ready">Ready?</button>
+            </div>
 
-    <ul id="player-list">
-        {{#each players}}
-            <li>{{username}}: {{points}} Points</li>
-        {{/each}}
-    </ul>
+            <div id="game-ui">
+                <h4 id="current-task"></h4>
+                <h4 id="timer"></h4>
+                <button class="game-button" id="skip">Skip word (-1 Point)</button>
+                <input type="text" name="answer" id="answer" value="" placeholder="Type here...">
+                <a class="game-button" id="leave-game" href="/game/matchlist">Leave the game</a>
+            </div>
 
-    <canvas id="game-canvas"></canvas>
+        </div>
 
-    <div id="game-ui">
-        <button id="ready">Ready?</button>
-        <h4 id="timer"></h4>
-        <h4 id="current-task"></h4>
-        <button class="button" id="skip">Skip word (-1 Point)</button>
-        <input type="text" name="answer" id="answer" value="" placeholder="Type here...">
+        <canvas id="game-canvas"></canvas>
+
     </div>
-
-
-    <a id="leave-game" href="/game/matchlist">Leave the game</a>
 
 </div>
 

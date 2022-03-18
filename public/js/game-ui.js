@@ -33,7 +33,7 @@ ctx.lineJoin = 'round';
 ctx.lineCap = 'round';
 
 const setTimerDisplay = (secondsLeft) => {
-    timerDisplay.textContent = 'Time left: ' + secondsLeft.toString();
+    timerDisplay.innerHTML = `Time left: <span class="time">${secondsLeft.toString()}</span>`;
 };
 
 const changeVisibility = (elementId, changeToVisible) => {
