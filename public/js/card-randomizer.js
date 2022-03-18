@@ -2,17 +2,18 @@ const drawingCards = document.querySelectorAll('.drawing-card');
 
 const cardRandomizer = (cardList) => {
     cardList.forEach((card, index, cardList) => {
+
         const randomColor = () => {
             const randomHue = Math.floor(Math.random() * 36) * 10 ;
-            const hsl = `hsl(${randomHue}, 80%, 30%)`;
+            const hsl = `hsl(${randomHue}, 90%, 25%)`;
             return hsl;
         }
     
-        card.style.transitionDelay = `${index / 4}s`;
+        card.style.transitionDelay = `${index * 1.5 / cardList.length}s`;
         card.style.backgroundColor = randomColor();
         setTimeout(() => {
             card.style.transitionDelay = '0s'
-        }, cardList.length * 1000 / 4)
+        }, 1000)
     
         const randomDegree = Math.floor(Math.random() * 60) - 30;
         card.style.background = `linear-gradient(${randomDegree}deg, ${randomColor()}, ${randomColor()})`;
@@ -32,4 +33,4 @@ const cardRandomizer = (cardList) => {
 
 setTimeout(() => {
     cardRandomizer(drawingCards);
-}, 50)
+}, 100)

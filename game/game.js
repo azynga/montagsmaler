@@ -10,7 +10,7 @@ class Game {
     constructor() {
         this.gameId = Date.now().toString(36);
         this.players = [];
-        this.roundTime = 5;
+        this.roundTime = 60;
         this.secondsLeft = this.roundTime;
         this.rounds = 1;
         this.currentRound = 0;

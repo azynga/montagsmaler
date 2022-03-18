@@ -27,9 +27,12 @@ socket.on('line stop', () => {
 
 socket.on('playerlist change', (players) => {
     playerList.textContent = '';
+    players.sort((playerA, playerB) => {
+        return playerB.points - playerA.points;
+    });
     players.forEach(player => {
         const newPlayer = document.createElement('li');
-        newPlayer.textContent = `${player.username}: ${player.points} Points`;
+        newPlayer.innerHTML = `${player.username}: <span class="time">${player.points}</span> Points`;
         playerList.appendChild(newPlayer);
     });
 });
@@ -68,6 +71,10 @@ socket.on('end round', () => {
     roundInProgress = false;
     readyButton.style.visibility = 'visible';
     changeVisibility('skip', false);
+    changeVisibility('answer', false);
+    changeVisibility('current-task', false);
+    changeVisibility('timer', false);
+
     clearCanvasInteraction();
 });
 

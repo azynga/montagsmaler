@@ -8,7 +8,7 @@ const updateGameList = (gamesInfo) => {
     const gameList = document.getElementById('game-list');
 
     if(gamesInfoArray.length <= 0) {
-        gameList.textContent = 'No games found :('
+        gameList.innerHTML = '<b>No games found :(</b>'
     } else {
         gameList.innerHTML = '';
         const createGameCard = (gameInfo, index) => {
@@ -33,6 +33,8 @@ const updateGameList = (gamesInfo) => {
             const joinButton = document.createElement('h4');
             if(inProgress && !isUserGame) {
                 joinButton.textContent = 'In progress';
+            } else if (isUserGame) {
+                joinButton.textContent = 'Your game';
             } else {
                 joinButton.textContent = 'Join';
             };
