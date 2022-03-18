@@ -1,5 +1,5 @@
 // Expanding images
-document.querySelectorAll('.drawing').forEach(drawing => {
+document.querySelectorAll('.drawing-small').forEach(drawing => {
     const expandedImg = document.getElementById('expanded-img');
     const overlayDiv = document.getElementById('overlay');
     drawing.onclick = () => {

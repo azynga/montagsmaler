@@ -8,10 +8,9 @@ const updateGameList = (gamesInfo) => {
     const gameList = document.getElementById('game-list');
 
     if(gamesInfoArray.length <= 0) {
-        gameList.textContent = 'No games found'
+        gameList.textContent = 'No games found :('
     } else {
         gameList.innerHTML = '';
-        
         const createGameCard = (gameInfo, index) => {
             const { gameId, inProgress, isUserGame, players } = gameInfo;
     
@@ -53,9 +52,7 @@ const updateGameList = (gamesInfo) => {
             const gameCard = createGameCard(game, index);
             gameList.append(gameCard);
         });
-
     };
-
 };
 
 setInterval(() => {
