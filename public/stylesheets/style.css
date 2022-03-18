@@ -131,7 +131,7 @@ form {
   padding: 3px;
   border-radius: 3px;
   text-align: center;
-  transition-duration: 0.3s;
+  /* transition-duration: 0.3s; */
 }
 
 .game:hover .button {
@@ -212,6 +212,10 @@ form {
   position: fixed;
 }
 
+#skip {
+  visibility: hidden;
+}
+
 .overlay {
   top: 0;
   left: 0;
@@ -244,17 +248,17 @@ form {
   transform: rotate(19deg);
   box-shadow: 0 2px 2px hsla(0, 0%, 0%, 0.2);
   font-family: 'Allissona GT Demo', sans-serif;
-
+  transition-duration: 0.5s;
 }
 
 #create-game:hover {
-  transform: scale(1.3) rotate(4deg);
-  box-shadow: 0 2px 12px hsla(0, 0%, 0%, 0.2);
-  font-weight: 100;
   text-decoration: underline;
   text-decoration-thickness: 1px;
   /* text-decoration-skip-ink: none; */
   text-underline-offset: 3px;
+  transform: scale(1.3) rotate(4deg);
+  box-shadow: 0 2px 12px hsla(0, 0%, 0%, 0.2);
+  transition-duration: 0.5s;
 }
 
 .join {

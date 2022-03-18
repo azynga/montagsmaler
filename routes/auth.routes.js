@@ -24,7 +24,6 @@ router.get('/login', isLoggedIn, (req, res, next) => {
 
 router.get('/logout', isLoggedIn, (req, res, next) => {
     const { currentUser } = req.session.currentUser;
-    // console.log(currentUser)
     req.session.destroy();
     res.render('auth/logout', { currentUser });
 });
@@ -33,7 +32,6 @@ router.get('/logout', isLoggedIn, (req, res, next) => {
 
 router.post('/signup', (req, res, next) => {
     const { username, password, email } = req.body;
-    // console.log('Signup body:', req.body);
     bcrypt.genSalt(saltRounds)
         .then(salt => bcrypt.hash(password, salt))
         .then(hashed => {
@@ -51,18 +49,14 @@ router.post('/signup', (req, res, next) => {
 router.post('/login', (req, res, next) => {
     const { username, password } = req.body
     
-    // console.log("req body:", req.body.password)
     User.findOne({username})
         .then(user => {
-            // console.log(user)
             if(!user){
 
                 return res.render('auth/login',  { errorMessage : 'Username/password incorrect or  user does not exist' });
             }
             else if(bcrypt.compareSync(password, user.password)){
-                // console.log('Autorization granted', user);
                 req.session.currentUser = user;
-                // console.log(req.session)
                 return res.redirect('/');
             }
             else{

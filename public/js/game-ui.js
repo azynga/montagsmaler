@@ -65,7 +65,6 @@ const drawLineToPoint = (fromPosition, toPosition) => {
 
 const drawFromPlayerInput = (event) => {
     if (penDown) {
-        // console.log(event.offsetX, event.offsetY);
         const { offsetX, offsetY } = event;
         const toPosition = {
             x: offsetX,
@@ -93,6 +92,8 @@ const setUi = (drawingPlayerId, activeRound) => {
         isDrawingPlayer = false;
         clearCanvasInteraction();
         changeVisibility('answer', true);
+        changeVisibility('timer', true);
+        changeVisibility('current-task', true);
         currentTaskDisplay.textContent = `Guess the word!`;
         answerInput.disabled = false;
         changeVisibility('skip', false);
@@ -101,27 +102,41 @@ const setUi = (drawingPlayerId, activeRound) => {
     const setDrawingUi = () => {
         isDrawingPlayer = true;
         setCanvasInteraction();
+        changeVisibility('current-task', true);
         changeVisibility('answer', false);
         currentTaskDisplay.textContent = `Draw '${currentWord}'!`;
         answerInput.disabled = true;
         changeVisibility('skip', true);
+        changeVisibility('timer', true);
+
     };
 
+    const setClearUi = () => {
+        isDrawingPlayer = false;
+        clearCanvasInteraction();
+        changeVisibility('answer', false);
+        changeVisibility('skip', false);
+        changeVisibility('timer', false);
+        changeVisibility('current-task', false);
+        changeVisibility('ready', true);
+    }
 
     if (activeRound) {
         changeVisibility('ready', false);
+        if (drawingPlayerId === userId) {
+            setDrawingUi();
+        }else {
+            setGuessingUi();
+        };
     } else {
-        changeVisibility('ready', true);
+        setClearUi();
     };
 
-    if (drawingPlayerId === userId) {
-        setDrawingUi();
-    } else {
-        setGuessingUi();
-    };
-    // if(gameOver) {
-    //     setEndGameUi();
-    // }
+    // if (drawingPlayerId === userId) {
+    //     setDrawingUi();
+    // } else {
+    //     setGuessingUi();
+    // };
 };
 
 const setEndGameUi = (players) => {
@@ -152,7 +167,7 @@ const setEndGameUi = (players) => {
     const leaveGameButton = document.createElement('a');
 
     leaveGameButton.href = `${location.origin}`;
-    
+
     playAgainButton.id = 'restart';
     playAgainButton.classList.add('button');
     playAgainButton.innerText = 'Play Again';
@@ -166,7 +181,10 @@ const setEndGameUi = (players) => {
     scoreScreen.classList.add('overlay');
 
     // changeVisibility('restart', true);
-    playAgainButton.onclick = () => scoreScreen.remove();
+    playAgainButton.onclick = () => {
+        scoreScreen.remove();
+        setUi();
+    };
     leaveGameButton.onclick = () => socket.emit('leave game');
 };
 
@@ -204,11 +222,11 @@ const clearCanvasInteraction = () => {
 
 const drawFromUpdate = (toPosition) => {
     let fromPosition = lastDrawPosition;
-    
+
     if (!fromPosition) {
         fromPosition = toPosition;
     };
-    
+
     drawLineToPoint(fromPosition, toPosition);
     lastDrawPosition = toPosition;
 };
@@ -237,9 +255,8 @@ answerInput.addEventListener('keydown', (event) => {
 });
 
 const sortByPoints = (players) => {
-    // console.log(players)
     return players.sort((a, b) => b.points - a.points);
-        return sortedPlayers
+    return sortedPlayers
 };
 
 

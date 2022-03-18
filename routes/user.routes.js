@@ -15,12 +15,12 @@ const saltRounds = 10
 router.get('/profile', isLoggedIn, (req, res, next) => {
   const { currentUser } = req.session;
   const userId = currentUser['_id']
-  // console.log(currentUser);
+
   User.findById(userId, { drawings: 1, '_id': 0 })
     .populate('drawings')
     .then(result => {
       const userDrawings = result.drawings;
-      // console.log(userDrawings)
+      
       res.render('user/profile', { currentUser, userDrawings });
     })
     .catch(error => console.error(error));
@@ -38,13 +38,13 @@ router.get('/settings', isLoggedIn, (req, res, next) => {
 router.post('/profile/drawing/:drawingId/delete', (req, res, next) => {
   const { drawingId } = req.params;
   const { currentUser } = req.session;
-  // console.log(id);
+  
   User.findOneAndUpdate({ username: currentUser.username}, { $pull: { drawings: drawingId }})
     .then(user => console.log('Drawing deleted from user'))
     .catch(error => console.log(error));
   Drawing.findByIdAndRemove(drawingId)
     .then(deletedDrawing => {
-      // console.log(deletedDrawing)
+      
       res.redirect('/user/profile')
     })
     .catch(error => console.log(error));
@@ -63,45 +63,33 @@ router.post('/settings', (req, res, next) => {
   // const updatePassword =
 
 
-  console.log(oldPassword, newPassword);
+  
   const { currentUser } = req.session;
   const userId = currentUser['_id']
-  // console.log('user id:',userId)
+  
   User.findOne({ username: currentUser.username })
     .then(user => {
-      // console.log(user)
-      // console.log(oldPassword, user.password);
+      
+      
       if (!oldPassword || !newPassword) {
         res.render('user/settings', { currentUser, message: 'You have to fill both camps' });
       }
       else if (bcrypt.compareSync(oldPassword, user.password)) {
-        // console.log('old password:', user.password)
+
         bcrypt.genSalt(saltRounds)
           .then(salt => bcrypt.hash(newPassword, salt))
           .then(hashed => {
-            // console.log('New password:', hashed)
+    
             User.updateOne({
               password: hashed
             })
               .then(response => {
-                // console.log(response)
+                
               })
               .catch(error => console.log(error))
           })
           .catch(error => console.log(error))
-        // User.findOneAndUpdate( { 
-        //   _id: userId
-        // },
-        // {
-        //   password: bcrypt.genSalt(saltRounds)
-        //   .then(salt => bcrypt.hash(newPassword, salt))
-        //   .catch(error =>console.log(error))
-        // },
-        // {
-        //   new: true,
-        // }
-        // )
-        //   .then(updatePassword => console.log('old password:', user.password,'Updated password: ',updatePassword));
+        
         res.render('user/settings', { currentUser, message: 'Password changed' });
       }
       else {
