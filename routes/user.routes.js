@@ -27,9 +27,9 @@ router.get('/profile', isLoggedIn, (req, res, next) => {
 });
 
 router.get('/settings', isLoggedIn, (req, res, next) => {
-  const avatarList = createAvatar();
+  // const avatarList = createAvatar();
   const { currentUser } = req.session;
-  res.render('user/settings', { currentUser, avatarList });
+  res.render('user/settings', { currentUser });
 
 });
 

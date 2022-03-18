@@ -7,18 +7,17 @@ const Drawing = require('../models/Drawing.model');
 /* GET home page */
 router.get("/", (req, res, next) => {
 
-  Drawing.find({isPublic: true}).sort({ updatedAt: -1})
+  Drawing.find({isPublic: true}).sort({ updatedAt: -1}).limit(7)
   .populate('creator')
   .then(drawings => {
-          if(req.session){
-          const {currentUser} = req.session
+      // console.log(drawings)
+        if(req.session) {
+        const {currentUser} = req.session
         res.render('index', { currentUser, drawings });
-      }
-      else{
-      
+        // console.log(req.session.currentUser)
+      } else {
         res.render("index", drawings);
-      }
-      
+      };
     })
     .catch(error => console.error(error));
   // res.send(req.session)

@@ -67,6 +67,7 @@ socket.on('tick', secondsLeft => {
 socket.on('end round', () => {
     roundInProgress = false;
     readyButton.style.visibility = 'visible';
+    changeVisibility('skip', false);
     clearCanvasInteraction();
 });
 

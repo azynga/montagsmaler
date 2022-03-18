@@ -1,31 +1,38 @@
-<h1>{{currentUser.username}}'s page</h1>
+<h2>Your drawings</h2>
 
 <div id="container">
-    <a href="/user/settings" style="color:black">Click here to edit your account details</a>
 
-    <h3>Your drawings:</h3>
     <div id="drawing-album">
         <div id="overlay">
             <img id="expanded-img" src="" alt="">
         </div>
         {{#each userDrawings}}
-            <figure class="drawing-card">
-                <img class="drawing" src="{{url}}" alt="user drawing of {{word}}">
-                <figcaption>{{word}}</figcaption>
+            <div class="drawing-card">
+                <figure>
+                    <img class="drawing-small" src="{{url}}" alt="User drawing of {{word}}">
+                    <figcaption>{{word}}</figcaption>
+                </figure>
                 <div class="button-div">
                     <form action="/user/profile/drawing/{{this._id}}/delete" method="post">
-                        <button class="delete-button">Delete</button>
+                        <button class="delete-button card-button" title="Delete drawing">
+                            <span class="material-icons md-light">delete</span>
+                        </button>
                     </form>
                     {{#unless isPublic}}
                     <form action="/user/profile/drawing/{{this._id}}/publish" method="post">
-                        <button class="publish-button">Publish</button>
+                        <button class="publish-button card-button" title="Publish drawing">
+                            <span class="material-icons md-light">publish</span>
+                        </button>
                     </form>
                     {{else}}
                     {{/unless}}
                 </div>
-            </figure>
+            </div>
         {{/each}}
     </div>
     
+    <a href="/user/settings" style="color:black">Click here to edit your account details</a>
+
     <script src="/js/profile.js"></script>
+    <script src="/js/card-randomizer.js"></script>
 </div>

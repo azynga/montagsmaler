@@ -263,6 +263,6 @@ const sortByPoints = (players) => {
 
 readyButton.onclick = () => socket.emit('player ready');
 
-leaveGame.onclick = () => socket.emit('leave game');
+leaveGame.onclick = () => confirm('Are you sure you want to leave the game?') && socket.emit('leave game');
 
 skipButton.onclick = () => socket.emit('skip');
