@@ -556,3 +556,31 @@ button {
   background-color: hsl(0, 20%, 2%);
   transition-duration: 0.2s;
 }
+
+#color-picker {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  top: 0;
+  right: 0;
+  position: fixed;
+  height: 100vh;
+  width: 25px;
+  z-index: 300;
+  transition-duration: 0.3s;
+}
+
+#color-picker:hover {
+  width: 70px;
+  transition-duration: 0.3s;
+}
+
+.color-sample {
+  /* position: absolute; */
+  display: block;
+  /* height: 40px; */
+  width: 100%;
+  flex-grow: 1;
+  /* clear: both; */
+  /* flex-shrink: 1; */
+}

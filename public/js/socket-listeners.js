@@ -8,7 +8,7 @@ socket.on('reconnect', (gameData) => {
         secondsLeft,
         activeRound
     } = gameData;
-
+    
     drawFromData(drawingData);
     currentWord = currentWordFromServer;
     setTimerDisplay(secondsLeft);
@@ -23,6 +23,10 @@ socket.on('drawing update', (toPosition) => {
 socket.on('line stop', () => {
     console.log('received line stop');
     lastDrawPosition = null;
+});
+
+socket.on('change color', (color) => {
+    ctx.strokeStyle = color;
 });
 
 socket.on('playerlist change', (players) => {
@@ -41,12 +45,12 @@ socket.on('playerlist change', (players) => {
     });
 });
 
-socket.on('next word', (currentWordFromServer, currentRound) => {
+socket.on('next word', (currentWordFromServer) => {
     console.log('received next word')
 
     const isDrawingOnCanvas = ctx.getImageData(0, 0, canvas.width, canvas.height).data.some(channel => channel !== 0);
-    
-    if(drawingPlayerId === userId && currentRound > 0 && isDrawingOnCanvas) {
+
+    if(drawingPlayerId === userId && isDrawingOnCanvas) {
 
         axios.post(`/game/${gameId}/drawing-store`, {
             creator: userId,
@@ -83,11 +87,11 @@ socket.on('end round', () => {
     changeVisibility('timer', false);
 
     clearCanvasInteraction();
+    ctx.strokeStyle = 'hsl(0, 80%, 0%)';
 });
 
 socket.on('end game', (players) => {
     console.log('received end game');
-    // playAgainButton.style.visibility = 'visible';
     
     setEndGameUi(players);
 });

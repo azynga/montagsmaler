@@ -9,6 +9,11 @@ module.exports = (io) => {
             
             const game = allGames[gameId];
 
+
+            console.log(game.drawingData)
+            console.log(game.drawingData[game.lineIndex])
+
+
             if(game) {
                 socket.join(gameId);
     
@@ -39,21 +44,33 @@ module.exports = (io) => {
                 connectedPlayer.socketId = socket.id;
     
           
-                socket.on('leave game', () => {
+                socket.on('leave game', (userId) => {
+                    console.log('remove player')
                     game.removePlayer(userId);
                 });
           
-                socket.on('drawing', (toPosition) => {
+                socket.on('drawing', (toPosition, color) => {
                     console.log('server received the drawing data');
                     socket.broadcast.to(gameId).emit('drawing update', toPosition);
+
                     const currentLine = game.drawingData[game.lineIndex];
+                    currentLine[0].color = color;
                     currentLine.push(toPosition);
                 });
             
                 socket.on('line stop', () => {
                     socket.broadcast.to(game.gameId).emit('line stop');
-                    game.drawingData.push([]);
+                    // const stoppedLine = game.drawingData[game.lineIndex];
+                    const nextLine = [{}];
+                    game.drawingData.push(nextLine);
                     game.lineIndex += 1;
+                });
+
+                socket.on('change color', (color) => {
+                    // console.log(color);
+                    socket.broadcast.to(game.gameId).emit('change color', color);
+                    // newlineStyle = game.drawingData[game.lineIndex][0];
+                    // newlineStyle.color = color;
                 });
     
                 socket.on('player ready', () => {
