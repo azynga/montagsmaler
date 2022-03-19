@@ -27,10 +27,44 @@ let roundInProgress = false;
 
 socket.emit('join game', gameId, userId);
 
-ctx.strokeStyle = 'hsla(40, 5%, 20%, 1)';
+ctx.strokeStyle = 'hsl(0, 80%, 0%)';
 ctx.lineWidth = 3;
 ctx.lineJoin = 'round';
 ctx.lineCap = 'round';
+
+const createColorPicker = () => {
+    const colorPicker = document.createElement('div');
+    const howManyColors = 12;
+    colorPicker.id = 'color-picker';
+
+    const createColorSample = (hue, lightness) => {
+        const colorSample = document.createElement('button');
+        const hsl = `hsl(${hue}, 80%, ${lightness}%)`;
+
+        colorSample.classList.add('color-sample');
+        colorSample.style.backgroundColor = hsl;
+        // colorSample.textContent = '.';
+        
+        colorSample.onclick = () => {
+            ctx.strokeStyle = hsl;
+            socket.emit('change color', hsl);
+        };
+
+        return colorSample;
+    };
+
+    for(let i = 0; i < howManyColors; i ++) {
+        const hue = i * (360 / howManyColors);
+        colorPicker.append(createColorSample(hue, 50));
+    };
+
+    colorPicker.append(createColorSample(0, 100), createColorSample(0, 0));
+
+    colorPicker.style.visibility = 'hidden';
+    body.append(colorPicker);
+}
+
+createColorPicker();
 
 const setTimerDisplay = (secondsLeft) => {
     timerDisplay.innerHTML = `Time left: <span class="time">${secondsLeft.toString()}</span>`;
@@ -47,8 +81,13 @@ const changeVisibility = (elementId, changeToVisible) => {
 
 const drawFromData = (drawingData) => {
     drawingData.forEach(line => {
-        let fromPosition = line[0];
-        line.forEach(toPosition => {
+        console.log(line);
+        ctx.strokeStyle = line[0].color;
+        let fromPosition = line[1];
+        line.forEach((toPosition, index) => {
+            if(index === 0) {
+                return;
+            };
             drawLineToPoint(fromPosition, toPosition);
             fromPosition = toPosition;
         });
@@ -79,7 +118,7 @@ const drawFromPlayerInput = (event) => {
 
         drawLineToPoint(fromPosition, toPosition);
 
-        socket.emit('drawing', toPosition);
+        socket.emit('drawing', toPosition, ctx.strokeStyle);
         console.log('emit drawing ');
 
         lastDrawPosition = toPosition;
@@ -97,6 +136,7 @@ const setUi = (drawingPlayerId, activeRound) => {
         currentTaskDisplay.textContent = `Guess the word!`;
         answerInput.disabled = false;
         changeVisibility('skip', false);
+        changeVisibility('color-picker', false);
     };
 
     const setDrawingUi = () => {
@@ -108,7 +148,7 @@ const setUi = (drawingPlayerId, activeRound) => {
         answerInput.disabled = true;
         changeVisibility('skip', true);
         changeVisibility('timer', true);
-
+        changeVisibility('color-picker', true);
     };
 
     const setClearUi = () => {
@@ -119,6 +159,7 @@ const setUi = (drawingPlayerId, activeRound) => {
         changeVisibility('timer', false);
         changeVisibility('current-task', false);
         changeVisibility('ready', true);
+        changeVisibility('color-picker', false);
     }
 
     if (activeRound) {
@@ -269,7 +310,7 @@ readyButton.onclick = () => {
     changeVisibility('ready', false);
 };
 
-leaveGame.onclick = () => confirm('Are you sure you want to leave the game?') && socket.emit('leave game');
+leaveGame.onclick = () => confirm('Are you sure you want to leave the game?') && socket.emit('leave game', userId);
 
 skipButton.onclick = () => socket.emit('skip');
 
@@ -298,3 +339,7 @@ skipButton.onclick = () => socket.emit('skip');
 //         drawingRoundsCount: 0
 //     }
 // ]);
+
+// window.onclick = () => {
+//     createColorPicker();
+// };

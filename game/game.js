@@ -16,7 +16,7 @@ class Game {
         this.currentRound = 0;
         this.timerId = null;
         this.inProgress = false;
-        this.drawingData = [[]];
+        this.drawingData = [[{ color: 'hsl(0, 80%, 0%)' }]];
         this.lineIndex = 0;
         this.currentWord = null;
         this.activeRound = false;
@@ -117,7 +117,7 @@ class Game {
     }
 
     nextWord() {
-        this.drawingData = [[]];
+        this.drawingData = [[{}]];
         this.lineIndex = 0;
         this.currentWord = this.getRandomWord();
         global.io.to(this.gameId).emit('next word', this.currentWord, this.currentRound);
