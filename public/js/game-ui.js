@@ -199,11 +199,13 @@ const setCanvasInteraction = () => {
         drawFromPlayerInput(event);
     };
 
-    canvas.onmouseup = () => {
-        penDown = false;
-        lastDrawPosition = null;
-        socket.emit('line stop');
-        console.log('emit line stop');
+    window.onmouseup = () => {
+        if(penDown) {
+            penDown = false;
+            lastDrawPosition = null;
+            socket.emit('line stop');
+            console.log('emit line stop');
+        };
     };
 
     canvas.onmousemove = (event) => {
@@ -211,10 +213,9 @@ const setCanvasInteraction = () => {
     };
 
     canvas.onmouseout = () => {
-        penDown = false;
-        lastDrawPosition = null;
-        socket.emit('line stop');
-        console.log('emit line stop');
+        if(penDown) {
+            lastDrawPosition = null;
+        };
     }
 };
 
