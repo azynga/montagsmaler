@@ -10,9 +10,9 @@ class Game {
     constructor() {
         this.gameId = Date.now().toString(36);
         this.players = [];
-        this.roundTime = 60;
+        this.roundTime = 120;
         this.secondsLeft = this.roundTime;
-        this.rounds = 1;
+        this.rounds = 2;
         this.currentRound = 0;
         this.timerId = null;
         this.inProgress = false;
@@ -56,7 +56,8 @@ class Game {
 
     endGame(players) {
         global.io.to(this.gameId).emit('end game', players);
-        this.resetGame()
+        this.nextWord();
+        this.resetGame();
     }
 
     getRandomWord() {
@@ -70,6 +71,7 @@ class Game {
         if(this.players.length > 1 && this.players.every(player => player.isReady) && !this.activeRound) {
             this.startRound();
         };
+        global.io.to(this.gameId).emit('playerlist change', this.players);
     }
 
     startRound() {
@@ -80,21 +82,27 @@ class Game {
         drawingPlayer.drawingRoundsCount += 1;
         this.secondsLeft = this.roundTime;
 
-        global.io.emit('tick', this.secondsLeft);
-
-        this.timerId = setInterval(() => {
-            this.secondsLeft -= 1;
+        // setTimeout(() => {
             global.io.emit('tick', this.secondsLeft);
-            if(this.secondsLeft <= 0) {
-                this.endRound();
-            };
-        }, 1000);
+    
+            this.timerId = setInterval(() => {
+                this.secondsLeft -= 1;
+                global.io.emit('tick', this.secondsLeft);
+                if(this.secondsLeft <= 0) {
+                    this.endRound();
+                };
+            }, 1000);
+    
+            this.nextWord();
+    
+            this.currentRound += 1;
 
-        this.nextWord();
+            this.players.forEach(player => player.isReady = false);
+    
+            global.io.to(this.gameId).emit('start round', drawingPlayer.userId);
 
-        this.currentRound += 1;
+        // }, 2000);
 
-        global.io.to(this.gameId).emit('start round', drawingPlayer.userId);
     }
 
     endRound() {
@@ -105,7 +113,6 @@ class Game {
             this.inProgress = false;
             this.endGame(this.players);
         };
-        this.players.forEach(player => player.isReady = false);
         global.io.to(this.gameId).emit('end round');
     }
 

@@ -30,16 +30,23 @@ socket.on('playerlist change', (players) => {
     players.sort((playerA, playerB) => {
         return playerB.points - playerA.points;
     });
+
     players.forEach(player => {
         const newPlayer = document.createElement('li');
-        newPlayer.innerHTML = `${player.username}: <span class="time">${player.points}</span> Points`;
+        newPlayer.innerHTML = `${player.username}: <span class="points">${player.points}</span> Points`;
+        if(player.isReady) {
+            newPlayer.classList.add('player-ready');
+        }
         playerList.appendChild(newPlayer);
     });
 });
 
 socket.on('next word', (currentWordFromServer, currentRound) => {
     console.log('received next word')
-    if(drawingPlayerId === userId && currentRound > 0) {
+
+    const isDrawingOnCanvas = ctx.getImageData(0, 0, canvas.width, canvas.height).data.some(channel => channel !== 0);
+    
+    if(drawingPlayerId === userId && currentRound > 0 && isDrawingOnCanvas) {
 
         axios.post(`/game/${gameId}/drawing-store`, {
             creator: userId,
