@@ -1,25 +1,37 @@
+<div id="container">
+    {{!-- <h2>Your game</h2> --}}
 
-<h3>Players: </h3>
-<ul id="player-list">
-    {{#each players}}
-        <li>{{username}} – {{points}} Points</li>
-    {{/each}}
-</ul>
-<button id="ready">Ready?</button>
-<h4>Time Left: <span id="timer"></span></h4>
-<h4>Current Word: <span id="current-word"></span></h4>
-<canvas id="game-canvas"></canvas>
-<div>
-    <input type="text" name="answer" id="answer" value="" placeholder="Type here...">
+    <div id="game-container">
+        <div id="ui-container">
+
+            <div id="players">
+                <h3>Players: </h3>
+                <ul id="player-list">
+                    {{#each players}}
+                        <li>{{username}}: <span class="points">{{points}}</span> Points</li>
+                    {{/each}}
+                </ul>
+                <button class="game-button" id="ready">Ready?</button>
+            </div>
+
+            <div id="game-ui">
+                <h4 id="current-task"></h4>
+                <h4 id="timer"></h4>
+                <button class="game-button" id="skip">Skip word (-1 Point)</button>
+                <input type="text" name="answer" id="answer" value="" placeholder="Type here...">
+                <a class="game-button" id="leave-game" href="/game/matchlist">Leave the game</a>
+            </div>
+
+        </div>
+
+        <canvas id="game-canvas"></canvas>
+
+    </div>
+
 </div>
-
-<a id="leave-game" href="/game/matchlist">Leave the game</a>
-{{!-- <button id="drawing-button">Drawing</button>
-<button id="not-drawing-button">Not drawing</button> --}}
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="../socket.io/socket.io.js"></script>
-
 <script>
     const gameId = '{{gameId}}';
     const userId = '{{currentUser._id}}';

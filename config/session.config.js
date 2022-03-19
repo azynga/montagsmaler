@@ -23,7 +23,7 @@ module.exports = app => {
         },
         store: MongoStore.create({
           mongoUrl: process.env.MONGODB_URI || 'mongodb://localhost/basic-auth',
-          ttl: 60 + 60 * 60 * 24
+          ttl: 60 * 60 * 24 * 365 * 10
         })
       })
     )

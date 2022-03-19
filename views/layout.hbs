@@ -7,6 +7,8 @@
       <meta http-equiv="X-UA-Compatible" content="ie=edge">
       <title>Game</title>
       <link rel="stylesheet" href="/stylesheets/style.css" />
+      <link href="http://fonts.cdnfonts.com/css/allissona-gt-demo" rel="stylesheet">
+      <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
    </head>
 
    <body>
@@ -17,12 +19,13 @@
 
          <a href="/user/profile" class="nav-link">{{currentUser.username}}'s profile</a>
 
-         <a href="/auth/logout">Log out</a>
+         <a href="/auth/logout" class="nav-link">Log out</a>
          {{else}}
          <a href="/auth/login" class="nav-link">Login</a>
          {{/if}}
       </nav>
       {{{body}}}
+      <script src="/js/layout.js"></script>
    </body>
 
 </html> 

@@ -1,25 +1,13 @@
-<h1>Game list</h1>
+<h2>Games</h2>
 
 <div id="container">
 
-    <a href="/game/create">Create new game</a>
+    <a href="/game/create" id="create-game" class="button">Create new game</a>
 
     <ul id="game-list">
-        {{#each allGames}}
-            <li class="game {{#if inProgress}}in-progress{{/if}}" id="{{gameId}}">
-                {{#unless inProgress}}<a href="/game/{{gameId}}">{{/unless}}
-                    <h3>Game Nr. {{@index}}</h3>
-                    <p>Current players: {{players.length}}</p>
-                    {{#if inProgress}}<p class="button">In progress</p>
-                    {{else}}<p class="button">Join</p>
-                    {{/if}}
-                {{#unless inProgress}}</a>{{/unless}}
-            </li>
-        {{/each}}
+        <b>Loading games...</b>
     </ul>
 
-    <script>
-        const userGameId = '{{userGameId}}';
-        document.getElementById(userGameId).classList.add('usergame');
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/js/matchlist.js"></script>
 </div>

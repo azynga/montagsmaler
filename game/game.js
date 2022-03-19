@@ -18,6 +18,8 @@ class Game {
         this.inProgress = false;
         this.drawingData = [[]];
         this.lineIndex = 0;
+        this.currentWord = null;
+        this.activeRound = false;
     }
 
     addPlayer(userId) {
@@ -48,14 +50,14 @@ class Game {
             setTimeout(() => {
                 global.io.to(this.gameId).emit('playerlist change', this.players);
                 console.log('emit playerlist change');
-                // console.log(this.players);
             }, 200);
         };
     }
 
-    endGame() {
-        this.inProgress = false;
-        global.io.to(this.gameId.emit('end game', this.players));
+    endGame(players) {
+        global.io.to(this.gameId).emit('end game', players);
+        this.nextWord();
+        this.resetGame();
     }
 
     getRandomWord() {
@@ -65,49 +67,60 @@ class Game {
 
     playerIsReady(socketId) {
         const player = this.players.find(player => player.socketId === socketId);
-        // console.log(player);
-        // console.log(socketId);
         player.isReady = true;
-        if(this.players.length > 1 && this.players.every(player => player.isReady)) {
+        if(this.players.length > 1 && this.players.every(player => player.isReady) && !this.activeRound) {
             this.startRound();
         };
+        global.io.to(this.gameId).emit('playerlist change', this.players);
     }
 
     startRound() {
         this.inProgress = true;
+        this.activeRound = true;
+
         const drawingPlayer = this.players[0];
         drawingPlayer.drawingRoundsCount += 1;
         this.secondsLeft = this.roundTime;
 
-        this.timerId = setInterval(() => {
-            this.secondsLeft -= 1;
-            if(this.secondsLeft <= 0) {
-                this.endRound();
-            };
-        }, 1000);
+        // setTimeout(() => {
+            global.io.emit('tick', this.secondsLeft);
+    
+            this.timerId = setInterval(() => {
+                this.secondsLeft -= 1;
+                global.io.emit('tick', this.secondsLeft);
+                if(this.secondsLeft <= 0) {
+                    this.endRound();
+                };
+            }, 1000);
+    
+            this.nextWord();
+    
+            this.currentRound += 1;
 
-        this.nextWord();
+            this.players.forEach(player => player.isReady = false);
+    
+            global.io.to(this.gameId).emit('start round', drawingPlayer.userId);
 
-        this.currentRound += 1;
+        // }, 2000);
 
-        global.io.to(this.gameId).emit('start round', drawingPlayer.userId);
     }
 
     endRound() {
         clearInterval(this.timerId);
+        this.activeRound = false;
         this.players.push(this.players.shift());
-        if(this.players[0].drawingRoundsCount > this.rounds) {
-            this.endGame();
+        if(this.players.every(player => player.drawingRoundsCount === this.rounds)) {
+            this.inProgress = false;
+            this.endGame(this.players);
         };
-        this.players.forEach(player => player.isReady = false);
         global.io.to(this.gameId).emit('end round');
     }
 
     nextWord() {
         this.drawingData = [[]];
         this.lineIndex = 0;
-        const nextWord = this.getRandomWord();
-        global.io.to(this.gameId).emit('next word', nextWord, this.currentRound);
+        this.currentWord = this.getRandomWord();
+        global.io.to(this.gameId).emit('next word', this.currentWord, this.currentRound);
     }
 
     correctGuess(socketId) {
@@ -119,6 +132,22 @@ class Game {
 
         global.io.to(this.gameId).emit('playerlist change', this.players);
         this.nextWord();
+    }
+
+    resetGame() {
+        this.players.forEach(player => {
+            player.points = 0;
+            player.isReady = false;
+            player.drawingRoundsCount= 0;
+        });
+        this.secondsLeft = this.roundTime;
+        this.currentRound = 0;
+        this.inProgress = false;
+        this.drawingData = [[]];
+        this.lineIndex = 0;
+        this.currentWord = null;
+        this.activeRound = false;
+        global.io.to(this.gameId).emit('playerlist change', this.players);
     }
 };
 

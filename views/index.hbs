@@ -1,12 +1,22 @@
-<h1>Homepage</h1>
-<div id="container">
-<div id="drawing-album">
-{{#each drawings}}
-        <figure class="drawing-card">
-            <img class="drawing" src="{{url}}" alt="user drawing of {{word}}">
-            <figcaption>{{word}}, {{creator.username}}</figcaption>
-        </figure>
+{{!-- <h1>Homepage</h1> --}}
+<h2>Welcome to Montagsmaler</h2>
 
-{{/each}}
+<div id="container">
+    <div id="drawing-album">
+    {{#if drawings}}
+        <div id="overlay">
+            <img id="expanded-img" src="" alt="">
+        </div>
+        {{#each drawings}}
+                <figure class="drawing-card">
+                    <img class="drawing-small" src="{{url}}" alt="{{creator.username}}'s drawing of {{word}}">
+                    <figcaption>'{{word}}' by {{creator.username}}</figcaption>
+                </figure>
+        {{/each}}
+    {{else}}
+        No drawings found.
+    {{/if}}
+    </div>
 </div>
-</div>
+<script src="/js/home.js"></script>
+<script src="/js/card-randomizer.js"></script>
