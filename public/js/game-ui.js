@@ -131,12 +131,6 @@ const setUi = (drawingPlayerId, activeRound) => {
     } else {
         setClearUi();
     };
-
-    // if (drawingPlayerId === userId) {
-    //     setDrawingUi();
-    // } else {
-    //     setGuessingUi();
-    // };
 };
 
 const setEndGameUi = (players) => {
@@ -150,35 +144,45 @@ const setEndGameUi = (players) => {
     body.appendChild(scoreScreen);
 
     const scoreList = document.createElement('ul');
-    scoreScreen.appendChild(scoreList);
+    scoreList.classList.add('final-score');
+    // scoreScreen.appendChild(scoreList);
 
     const sortedPlayers = sortByPoints(players); // There is probably thousand better ways to do this, but I don't know/ am afraid to test
     const winnerElement = document.createElement('h2');
-    scoreScreen.appendChild(winnerElement);
+    // scoreScreen.appendChild(winnerElement);
     winnerElement.innerText = `${players[0].username} won!`;
 
     sortedPlayers.forEach(player => {           // Same as above
-        const finalScoreList = document.createElement('li');
-        finalScoreList.innerText = `${player.username}: ${player.points}`;
-        scoreList.appendChild(finalScoreList);
+        const playerListItem = document.createElement('li');
+        playerListItem.innerText = `${player.username}: ${player.points}`;
+        scoreList.appendChild(playerListItem);
     });
+
+    const buttonContainer = document.createElement('div');
+    buttonContainer.id = 'end-buttons';
 
     const playAgainButton = document.createElement('button');
     const leaveGameButton = document.createElement('a');
 
-    leaveGameButton.href = `${location.origin}`;
+    leaveGameButton.href = `/`;
 
-    playAgainButton.id = 'restart';
+    // playAgainButton.id = 'restart';
     playAgainButton.classList.add('button');
     playAgainButton.innerText = 'Play Again';
-    scoreScreen.appendChild(playAgainButton);
 
-    leaveGameButton.id = 'leave-game';
+    // leaveGameButton.id = 'leave-game';
     leaveGameButton.classList.add('button');
     leaveGameButton.innerText = 'Leave room';
-    scoreScreen.appendChild(leaveGameButton);
+    
+    buttonContainer.append(playAgainButton, leaveGameButton);
 
-    scoreScreen.classList.add('overlay');
+    const endMessageContainer = document.createElement('div');
+    endMessageContainer.id = 'end-message';
+
+    endMessageContainer.append(winnerElement, scoreList, buttonContainer);
+    scoreScreen.append(endMessageContainer);
+
+    scoreScreen.classList.add('end-overlay');
 
     // changeVisibility('restart', true);
     playAgainButton.onclick = () => {
@@ -240,16 +244,16 @@ answerInput.addEventListener('keydown', (event) => {
         answerInput.value = '';
 
         if (currentAttempt.toLowerCase() === currentWord.toLowerCase()) {
-            answerInput.classList.add('right-answer');
+            canvas.classList.add('right-answer');
             setTimeout(() => {
-                answerInput.classList.remove('right-answer');
-            }, 3000);
+                canvas.classList.remove('right-answer');
+            }, 1500);
             socket.emit('correct guess');
         } else {
-            answerInput.classList.add('wrong-answer');
+            canvas.classList.add('wrong-answer');
             setTimeout(() => {
-                answerInput.classList.remove('wrong-answer');
-            }, 3000);
+                canvas.classList.remove('wrong-answer');
+            }, 1500);
         };
     };
 });
@@ -259,10 +263,37 @@ const sortByPoints = (players) => {
     return sortedPlayers
 };
 
-
-
-readyButton.onclick = () => socket.emit('player ready');
+readyButton.onclick = () => {
+    socket.emit('player ready');
+    changeVisibility('ready', false);
+};
 
 leaveGame.onclick = () => confirm('Are you sure you want to leave the game?') && socket.emit('leave game');
 
 skipButton.onclick = () => socket.emit('skip');
+
+
+// for testing
+// window.onclick = () => setEndGameUi([
+//     {
+//         username: 'vitor',
+//         userId,
+//         points: 5,
+//         isReady: false,
+//         drawingRoundsCount: 0
+//     },
+//     {
+//         username: 'aljoscha',
+//         userId,
+//         points: 2,
+//         isReady: false,
+//         drawingRoundsCount: 0
+//     },
+//     {
+//         username: 'dina',
+//         userId,
+//         points: 4,
+//         isReady: false,
+//         drawingRoundsCount: 0
+//     }
+// ]);
