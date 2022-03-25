@@ -32,9 +32,16 @@ ctx.lineWidth = 3;
 ctx.lineJoin = 'round';
 ctx.lineCap = 'round';
 
+const setDefaulLineStyle = () => {
+    ctx.strokeStyle = 'hsl(0, 80%, 0%)';
+    ctx.lineWidth = 2.56;
+    const widthSamples = document.querySelectorAll('.width-sample > div');
+    widthSamples.forEach(widthSample => widthSample.style.backgroundColor = ctx.strokeStyle);
+}
+
 const createColorPicker = () => {
     const colorPicker = document.createElement('div');
-    const howManyColors = 12;
+    const howManyColors = 18;
     colorPicker.id = 'color-picker';
 
     const createColorSample = (hue, lightness) => {
@@ -47,7 +54,9 @@ const createColorPicker = () => {
         
         colorSample.onclick = () => {
             ctx.strokeStyle = hsl;
-            socket.emit('change color', hsl);
+            const widthSamples = document.querySelectorAll('.width-sample > div');
+            widthSamples.forEach(widthSample => widthSample.style.backgroundColor = hsl);
+            socket.emit('change line style', hsl, ctx.lineWidth);
         };
 
         return colorSample;
@@ -61,9 +70,51 @@ const createColorPicker = () => {
     colorPicker.append(createColorSample(0, 100), createColorSample(0, 0));
 
     colorPicker.style.visibility = 'hidden';
-    body.append(colorPicker);
+    document.getElementById('canvas-container').append(colorPicker);
 }
 
+const createWidthPicker = () => {
+    const widthPicker = document.createElement('div');
+    // const howManyWidths = 10;
+    const maxWidth = 70;
+    const minWidth = 1;
+
+    widthPicker.id = 'width-picker';
+
+    const createWidthSample = (width) => {
+        const widthSampleContainer = document.createElement('button');
+        
+        widthSampleContainer.classList.add('width-sample');
+        
+        const widthSample = document.createElement('div');
+        const widthPx = `${width}px`;
+
+        widthSample.style.width = widthPx;
+        widthSample.style.height = '100%';
+        widthSample.style.backgroundColor = 'black';
+
+        widthSampleContainer.append(widthSample);
+        
+        widthSampleContainer.onclick = () => {
+            ctx.lineWidth = width;
+            socket.emit('change line style', ctx.strokeStyle, width);
+        };
+
+        return widthSampleContainer;
+    };
+
+    for(let width = minWidth; width <= maxWidth; width *= 1.6) {
+        // const range = maxWidth - minWidth;
+        // const width = minWidth + (range / howManyWidths) * i;
+
+        widthPicker.append(createWidthSample(width));
+    };
+
+    widthPicker.style.visibility = 'hidden';
+    document.getElementById('canvas-container').append(widthPicker);
+}
+
+createWidthPicker();
 createColorPicker();
 
 const setTimerDisplay = (secondsLeft) => {
@@ -82,15 +133,18 @@ const changeVisibility = (elementId, changeToVisible) => {
 const drawFromData = (drawingData) => {
     drawingData.forEach(line => {
         console.log(line);
-        ctx.strokeStyle = line[0].color;
-        let fromPosition = line[1];
-        line.forEach((toPosition, index) => {
-            if(index === 0) {
-                return;
-            };
-            drawLineToPoint(fromPosition, toPosition);
-            fromPosition = toPosition;
-        });
+        if(line[0]) {
+            ctx.strokeStyle = line[0].color;
+            ctx.lineWidth = line[0].width;
+            let fromPosition = line[1];
+            line.forEach((toPosition, index) => {
+                if(index === 0) {
+                    return;
+                };
+                drawLineToPoint(fromPosition, toPosition);
+                fromPosition = toPosition;
+            });
+        }
     });
 };
 
@@ -118,14 +172,14 @@ const drawFromPlayerInput = (event) => {
 
         drawLineToPoint(fromPosition, toPosition);
 
-        socket.emit('drawing', toPosition, ctx.strokeStyle);
+        socket.emit('drawing', toPosition, ctx.strokeStyle, ctx.lineWidth);
         console.log('emit drawing ');
 
         lastDrawPosition = toPosition;
     };
 };
 
-const setUi = (drawingPlayerId, activeRound) => {
+const setUi = (drawingPlayerId, roundInProgress) => {
 
     const setGuessingUi = () => {
         isDrawingPlayer = false;
@@ -137,6 +191,9 @@ const setUi = (drawingPlayerId, activeRound) => {
         answerInput.disabled = false;
         changeVisibility('skip', false);
         changeVisibility('color-picker', false);
+        changeVisibility('width-picker', false);
+        // document.getElementById('color-picker').style.width = '0px';
+        // document.getElementById('width-picker').style.height = '0px';
     };
 
     const setDrawingUi = () => {
@@ -149,6 +206,13 @@ const setUi = (drawingPlayerId, activeRound) => {
         changeVisibility('skip', true);
         changeVisibility('timer', true);
         changeVisibility('color-picker', true);
+        changeVisibility('width-picker', true);
+        // document.getElementById('color-picker').style.width = '15px';
+        // document.getElementById('color-picker').onmouseover = (event) => event.target.style.width = '50px';
+        // document.getElementById('color-picker').onmouseout = (event) => event.target.style.width = '15px';
+        // document.getElementById('width-picker').style.height = '15px';
+        // document.getElementById('width-picker').onmouseover = (event) => event.target.style.height = '50px';
+        // document.getElementById('width-picker').onmouseout = (event) => event.target.style.height = '15px';
     };
 
     const setClearUi = () => {
@@ -160,9 +224,12 @@ const setUi = (drawingPlayerId, activeRound) => {
         changeVisibility('current-task', false);
         changeVisibility('ready', true);
         changeVisibility('color-picker', false);
+        changeVisibility('width-picker', false);
+        // document.getElementById('color-picker').style.width = '0px';
+        // document.getElementById('width-picker').style.height = '0px';
     }
 
-    if (activeRound) {
+    if (roundInProgress) {
         changeVisibility('ready', false);
         if (drawingPlayerId === userId) {
             setDrawingUi();
@@ -176,8 +243,8 @@ const setUi = (drawingPlayerId, activeRound) => {
 
 const setEndGameUi = (players) => {
     isGameOver = true;
-    console.log('end game function');
-    clearCanvasInteraction();
+    // clearCanvasInteraction();
+    setUi();
 
     const scoreScreen = document.createElement('div');
     scoreScreen.id = 'overlay';
@@ -230,7 +297,7 @@ const setEndGameUi = (players) => {
         scoreScreen.remove();
         setUi();
     };
-    leaveGameButton.onclick = () => socket.emit('leave game');
+    leaveGameButton.onclick = () => socket.emit('leave game', userId);
 };
 
 
@@ -264,6 +331,7 @@ const clearCanvasInteraction = () => {
     canvas.onmousedown = null;
     canvas.onmouseup = null;
     canvas.onmousemove = null;
+    canvas.onmouseout = null;
 };
 
 const drawFromUpdate = (toPosition) => {

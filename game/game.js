@@ -16,7 +16,7 @@ class Game {
         this.currentRound = 0;
         this.timerId = null;
         this.inProgress = false;
-        this.drawingData = [[{ color: 'hsl(0, 80%, 0%)' }]];
+        this.drawingData = [[{}]];
         this.lineIndex = 0;
         this.currentWord = null;
         this.activeRound = false;
@@ -43,19 +43,25 @@ class Game {
 
     removePlayer(userId) {
         this.players = this.players.filter(player => player.userId !== userId);
+
+        if(this.activeRound && userId === this.players[0].userId) {
+            this.endRound();
+        }
         delete usersInGames[userId];
         if(this.players.length <= 0) {
             delete allGames[this.gameId];
+        } else if(this.players.length <= 1 && this.inProgress) {
+                this.endGame();
         } else {
             setTimeout(() => {
                 global.io.to(this.gameId).emit('playerlist change', this.players);
-                console.log('emit playerlist change');
             }, 200);
         };
     }
 
     endGame(players) {
         global.io.to(this.gameId).emit('end game', players);
+        this.endRound();
         this.nextWord();
         this.resetGame();
     }
@@ -117,7 +123,7 @@ class Game {
     }
 
     nextWord() {
-        this.drawingData = [[{}]];
+        this.drawingData = [[{ color: 'hsl(0, 80%, 0%)' }]];
         this.lineIndex = 0;
         this.currentWord = this.getRandomWord();
         global.io.to(this.gameId).emit('next word', this.currentWord, this.currentRound);

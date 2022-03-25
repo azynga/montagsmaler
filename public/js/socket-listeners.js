@@ -1,4 +1,4 @@
-socket.on('connect',() => setUi())
+socket.on('connect', () => setUi())
 
 socket.on('reconnect', (gameData) => {
     const {
@@ -25,8 +25,9 @@ socket.on('line stop', () => {
     lastDrawPosition = null;
 });
 
-socket.on('change color', (color) => {
+socket.on('change line style', (color, width) => {
     ctx.strokeStyle = color;
+    ctx.lineWidth = width;
 });
 
 socket.on('playerlist change', (players) => {
@@ -37,6 +38,7 @@ socket.on('playerlist change', (players) => {
 
     players.forEach(player => {
         const newPlayer = document.createElement('li');
+        newPlayer.id = player.username;
         newPlayer.innerHTML = `${player.username}: <span class="points">${player.points}</span> Points`;
         if(player.isReady) {
             newPlayer.classList.add('player-ready');
@@ -58,14 +60,23 @@ socket.on('next word', (currentWordFromServer) => {
             url: canvas.toDataURL(),
             isPublic: false
         });
-        
     };
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    setDefaulLineStyle();
+
     currentWord = currentWordFromServer;
     
     if(drawingPlayerId === userId) {
         currentTaskDisplay.textContent = `Draw '${currentWord}'!`;
-    }
+    };
+
+    if(penDown) {
+        penDown = false;
+        lastDrawPosition = null;
+        socket.emit('line stop');
+    };
 });
 
 socket.on('start round', (drawingPlayerIdFromServer) => {
@@ -80,13 +91,14 @@ socket.on('tick', secondsLeft => {
 
 socket.on('end round', () => {
     roundInProgress = false;
-    readyButton.style.visibility = 'visible';
-    changeVisibility('skip', false);
-    changeVisibility('answer', false);
-    changeVisibility('current-task', false);
-    changeVisibility('timer', false);
+    setUi(drawingPlayerId, roundInProgress);
+    // readyButton.style.visibility = 'visible';
+    // changeVisibility('skip', false);
+    // changeVisibility('answer', false);
+    // changeVisibility('current-task', false);
+    // changeVisibility('timer', false);
 
-    clearCanvasInteraction();
+    // clearCanvasInteraction();
     ctx.strokeStyle = 'hsl(0, 80%, 0%)';
 });
 
