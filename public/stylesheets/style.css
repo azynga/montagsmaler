@@ -88,12 +88,12 @@ form {
 #game-canvas {
   box-shadow: 0 5px 15px hsla(0, 0%, 0%, 0.2);
   background-color: hsl(28, 50%, 99%);
-  position: relative;
+  /* position: relative;
   left: 140px;
-  transform: rotate(3deg);
+  transform: rotate(3deg); */
   /* margin-left: 200px; */
   /* margin-top: 40px; */
-  /* z-index: 20; */
+  z-index: 5;
   /* border-radius: 10px; */
   transition: background-color 0.1s, box-shadow 0.1s;
 }
@@ -175,7 +175,7 @@ form {
   box-shadow: 0 5px 5px hsla(0, 0%, 0%, 0.2);
   background-color: hsl(0, 20%, 80%);
   padding: 10px;
-  border-radius: 2px;
+  border-radius: 5px;
   border-bottom: solid 1px hsla(9, 91%, 95%, 0.5);
   opacity: 0;
   transform: rotate(0deg) scale(1.8);
@@ -188,11 +188,15 @@ form {
 }
 
 .drawing-card figcaption {
-  color: hsl(9, 91%, 98%);
+  /* color: hsl(9, 91%, 98%); */
+  color: hsl(0, 20%, 20%);
   width: 170px;
   height: 50px;
   text-align: center;
   font-size: 13px;
+  font-weight: bold;
+  /* background-color: hsl(0, 20%, 20%); */
+
 }
 
 .drawing-card:hover {
@@ -205,7 +209,7 @@ form {
 .drawing-small {
   width: 170px;
   background-color: hsl(9, 91%, 98%);
-  /* border: solid 2px black; */
+  border: solid 1px hsl(0, 3%, 50%);
 }
 
 .user-game {
@@ -219,7 +223,7 @@ form {
 
 #overlay {
   position: fixed;
-  transition-duration: 0.5s;
+  transition: background-color 0.5s, backdrop-filter 0.5s;
   z-index: 100;
 }
 
@@ -299,19 +303,22 @@ form {
   gap: 3px;
   opacity: 0;
   transition-duration: 0.3s;
-  background-color: hsla(9, 91%, 98%, 0.8);
 }
 
 .card-button {
   all: unset;
   padding: 3px;
   border-radius: 1px;
+  background-color: hsla(9, 91%, 98%, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
   /* border: solid 1px transparent; */
 }
 
 .card-button:hover {
   /* border: solid 1px hsla(0, 20%, 10%, 0.5); */
-  background-color: hsla(9, 31%, 92%, 0.8);
+  background-color: hsla(9, 31%, 95%, 0.95);
   box-shadow: 0 0px 1px hsla(0, 0%, 0%, 0.6);
   cursor: pointer;
 }
@@ -429,16 +436,33 @@ button {
   cursor: pointer;
 }
 
-#ui-container .game-button {
+.game-button {
   padding: 5px 0;
   font-weight: bold;
+  width: fit-content;
+  position: relative;
 }
 
-#ui-container .button:hover {
-  text-decoration: underline;
-  text-underline-offset: -20px;
+.game-button::before {
+  color: transparent;
+  padding: 5px 0;
+  text-decoration: line-through;
+  text-decoration-color: hsl(0, 69%, 70%);
   text-decoration-thickness: 15px;
-  text-decoration-skip-ink: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  z-index: -1;
+}
+
+.game-button:hover::before {
+  width: 250px;
+  transition: width 0.4s;
+  transition-timing-function: linear;
+  transform: skewX(-8deg);
 }
 
 #leave-game {
@@ -446,17 +470,18 @@ button {
   margin-top: auto;
 }
 
-#leave-game:hover {
-  text-decoration: underline;
-  text-underline-offset: -20px;
-  text-decoration-thickness: 15px;
-  text-decoration-skip-ink: none;
-  text-decoration-color: hsl(0, 69%, 70%);
+#ready::before {
+  content: "Ready?";
+  text-decoration-color: hsl(90, 68%, 70%);
 }
 
-/* #game-ui * {
-  visibility: visible !important;
-} */
+#skip::before {
+  content: "Skip word (-1 Point)";
+}
+
+#leave-game::before {
+  content: "Leave the game";
+}
 
 .points {
   font: 20px 'Courier New', monospace;
@@ -464,22 +489,6 @@ button {
 
 .time {
   font: 20px 'Courier New', monospace;
-}
-
-#ready:hover {
-  text-decoration: underline;
-  text-underline-offset: -20px;
-  text-decoration-thickness: 15px;
-  text-decoration-skip-ink: none;
-  text-decoration-color: hsl(90, 68%, 70%);
-}
-
-#skip:hover {
-  text-decoration: underline;
-  text-underline-offset: -20px;
-  text-decoration-thickness: 15px;
-  text-decoration-skip-ink: none;
-  text-decoration-color: hsl(0, 69%, 70%);
 }
 
 #answer {
@@ -490,11 +499,23 @@ button {
 }
 
 .player-ready {
-  text-decoration: underline;
-  text-underline-offset: -20px;
-  text-decoration-thickness: 15px;
-  text-decoration-skip-ink: none;
+  position: relative;
+}
+
+.player-ready::before {
+  color: transparent;
+  content: attr(id) ": 0 Points";
+  padding: 5px 0;
+  text-decoration: line-through;
   text-decoration-color: hsl(90, 68%, 70%);
+  text-decoration-thickness: 15px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 300px;
+  overflow: hidden;
+  white-space: nowrap;
+  z-index: -1;
 }
 
 .end-overlay {
@@ -538,6 +559,10 @@ button {
   /* background-color: hsl(0, 69%, 70%) */
 }
 
+#end-button > *:hover {
+  text-decoration: underline;
+}
+
 #settings-link {
   align-self: flex-end;
   font-size: 16px;
@@ -557,30 +582,81 @@ button {
   transition-duration: 0.2s;
 }
 
+#canvas-container {
+  position: relative;
+  display: flex;
+  left: 140px;
+  transform: rotate(3deg);
+}
+
 #color-picker {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  top: 0;
-  right: 0;
+  left: 600px;
   position: fixed;
-  height: 100vh;
-  width: 25px;
-  z-index: 300;
-  transition-duration: 0.3s;
+  height: 100%;
+  width: 15px;
+  transition: width 0.3s;
 }
 
 #color-picker:hover {
-  width: 70px;
-  transition-duration: 0.3s;
+  width: 50px;
+  transition: width 0.3s;
 }
 
 .color-sample {
-  /* position: absolute; */
+  box-shadow: 0 5px 15px hsla(0, 0%, 0%, 0.2);
   display: block;
-  /* height: 40px; */
+  border-radius: 0 3px 3px 0;
   width: 100%;
   flex-grow: 1;
-  /* clear: both; */
-  /* flex-shrink: 1; */
+  transition: width 0.3s;
+}
+
+.color-sample:hover {
+  width: 70px;
+  transition: width 0.3s;
+}
+
+#width-picker {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  bottom: 600px;
+  position: fixed;
+  height: 15px;
+  width: 100%;
+  transition: height 0.3s;
+}
+
+#width-picker:hover {
+  height: 30px;
+  transition: height 0.3s;
+}
+
+.width-sample {
+  position: relative;
+  bottom: 0;
+  background-color: hsl(9, 21%, 95%);
+  box-shadow: 0 5px 15px hsla(0, 0%, 0%, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0 3px 3px 0;
+  height: 100%;
+  flex-grow: 1;
+  transition: height 0.3s, bottom 0.3s;
+}
+
+.width-sample:hover {
+  height: 50px;
+  bottom: 20px;
+  transition: height 0.3s, bottom 0.3s;
+}
+
+#download-link {
+  visibility: hidden;
+  z-index: 500;
+  align-self: flex-end;
 }

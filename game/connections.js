@@ -49,28 +49,25 @@ module.exports = (io) => {
                     game.removePlayer(userId);
                 });
           
-                socket.on('drawing', (toPosition, color) => {
+                socket.on('drawing', (toPosition, color, width) => {
                     console.log('server received the drawing data');
                     socket.broadcast.to(gameId).emit('drawing update', toPosition);
 
                     const currentLine = game.drawingData[game.lineIndex];
                     currentLine[0].color = color;
+                    currentLine[0].width = width;
                     currentLine.push(toPosition);
                 });
             
                 socket.on('line stop', () => {
                     socket.broadcast.to(game.gameId).emit('line stop');
-                    // const stoppedLine = game.drawingData[game.lineIndex];
                     const nextLine = [{}];
                     game.drawingData.push(nextLine);
                     game.lineIndex += 1;
                 });
 
-                socket.on('change color', (color) => {
-                    // console.log(color);
-                    socket.broadcast.to(game.gameId).emit('change color', color);
-                    // newlineStyle = game.drawingData[game.lineIndex][0];
-                    // newlineStyle.color = color;
+                socket.on('change line style', (color, width) => {
+                    socket.broadcast.to(game.gameId).emit('change line style', color, width);
                 });
     
                 socket.on('player ready', () => {

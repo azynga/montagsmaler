@@ -2,15 +2,21 @@
 document.querySelectorAll('.drawing-small').forEach(drawing => {
     const expandedImg = document.getElementById('expanded-img');
     const overlayDiv = document.getElementById('overlay');
+    const downloadLink = document.getElementById('download-link');
+
     drawing.onclick = () => {
         overlayDiv.classList.add('overlay');
         expandedImg.src = drawing.src;
         expandedImg.alt = drawing.alt;
+        downloadLink.href = drawing.src;
+        downloadLink.download = drawing.alt;
+        downloadLink.style.visibility = 'visible';
     };
     overlayDiv.onclick = () => {
         overlay.classList.remove('overlay');
         expandedImg.src = '';
         expandedImg.alt = '';
+        downloadLink.style.visibility = 'hidden';
     };
 });
 // Delete button

@@ -8,7 +8,7 @@
                 <h3>Players: </h3>
                 <ul id="player-list">
                     {{#each players}}
-                        <li>{{username}}: <span class="points">{{points}}</span> Points</li>
+                        <li id="{{username}}">{{username}}: <span class="points">{{points}}</span> Points</li>
                     {{/each}}
                 </ul>
                 <button class="game-button" id="ready">Ready?</button>
@@ -24,7 +24,9 @@
 
         </div>
 
-        <canvas id="game-canvas"></canvas>
+        <div id="canvas-container">
+            <canvas id="game-canvas"></canvas>
+        </div>
 
     </div>
 

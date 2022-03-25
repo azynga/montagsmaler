@@ -7,11 +7,12 @@
     <div id="drawing-album">
         <div id="overlay">
             <img id="expanded-img" src="" alt="">
+            <a id="download-link" href="" download="">download</a>
         </div>
         {{#each userDrawings}}
             <div class="drawing-card">
                 <figure>
-                    <img class="drawing-small" src="{{url}}" alt="User drawing of {{word}}">
+                    <img class="drawing-small" src="{{url}}" alt="Drawing of {{word}}">
                     <figcaption>{{word}}</figcaption>
                 </figure>
                 <div class="button-div">
