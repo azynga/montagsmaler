@@ -47,11 +47,14 @@ class Game {
         if(this.activeRound && userId === this.players[0].userId) {
             this.endRound();
         }
+
         delete usersInGames[userId];
+
         if(this.players.length <= 0) {
             delete allGames[this.gameId];
         } else if(this.players.length <= 1 && this.inProgress) {
-                this.endGame();
+            this.endRound();
+            this.endGame();
         } else {
             setTimeout(() => {
                 global.io.to(this.gameId).emit('playerlist change', this.players);
@@ -61,7 +64,6 @@ class Game {
 
     endGame(players) {
         global.io.to(this.gameId).emit('end game', players);
-        this.endRound();
         this.nextWord();
         this.resetGame();
     }
