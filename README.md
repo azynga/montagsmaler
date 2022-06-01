@@ -1,4 +1,4 @@
-The second project of the Ironhack Web Development Bootcamp.
+The second project of the Ironhack Web Development Bootcamp.  
 Made by Vitor Martins and Aljoscha Zynga
 
 # Montagsmaler
