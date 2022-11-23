@@ -1,4 +1,4 @@
-socket.on('connect', () => setUi())
+socket.on('connect', () => setUi());
 
 socket.on('reconnect', (gameData) => {
     const {
@@ -6,9 +6,9 @@ socket.on('reconnect', (gameData) => {
         drawingPlayerId,
         currentWord: currentWordFromServer,
         secondsLeft,
-        activeRound
+        activeRound,
     } = gameData;
-    
+
     drawFromData(drawingData);
     currentWord = currentWordFromServer;
     setTimerDisplay(secondsLeft);
@@ -36,11 +36,11 @@ socket.on('playerlist change', (players) => {
         return playerB.points - playerA.points;
     });
 
-    players.forEach(player => {
+    players.forEach((player) => {
         const newPlayer = document.createElement('li');
         newPlayer.id = player.username;
         newPlayer.innerHTML = `${player.username}: <span class="points">${player.points}</span> Points`;
-        if(player.isReady) {
+        if (player.isReady) {
             newPlayer.classList.add('player-ready');
         }
         playerList.appendChild(newPlayer);
@@ -48,35 +48,36 @@ socket.on('playerlist change', (players) => {
 });
 
 socket.on('next word', (currentWordFromServer) => {
-    console.log('received next word')
+    console.log('received next word');
 
-    const isDrawingOnCanvas = ctx.getImageData(0, 0, canvas.width, canvas.height).data.some(channel => channel !== 0);
+    const isDrawingOnCanvas = ctx
+        .getImageData(0, 0, canvas.width, canvas.height)
+        .data.some((channel) => channel !== 0);
 
-    if(drawingPlayerId === userId && isDrawingOnCanvas) {
-
+    if (drawingPlayerId === userId && isDrawingOnCanvas) {
         axios.post(`/game/${gameId}/drawing-store`, {
             creator: userId,
             word: currentWord,
             url: canvas.toDataURL(),
-            isPublic: false
+            isPublic: false,
         });
-    };
+    }
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     setDefaulLineStyle();
 
     currentWord = currentWordFromServer;
-    
-    if(drawingPlayerId === userId) {
-        currentTaskDisplay.textContent = `Draw '${currentWord}'!`;
-    };
 
-    if(penDown) {
+    if (drawingPlayerId === userId) {
+        currentTaskDisplay.textContent = `Draw '${currentWord}'!`;
+    }
+
+    if (penDown) {
         penDown = false;
         lastDrawPosition = null;
         socket.emit('line stop');
-    };
+    }
 });
 
 socket.on('start round', (drawingPlayerIdFromServer) => {
@@ -84,7 +85,7 @@ socket.on('start round', (drawingPlayerIdFromServer) => {
     setUi(drawingPlayerId, true);
 });
 
-socket.on('tick', secondsLeft => {
+socket.on('tick', (secondsLeft) => {
     roundInProgress = true;
     setTimerDisplay(secondsLeft);
 });
@@ -92,18 +93,10 @@ socket.on('tick', secondsLeft => {
 socket.on('end round', () => {
     roundInProgress = false;
     setUi(drawingPlayerId, roundInProgress);
-    // readyButton.style.visibility = 'visible';
-    // changeVisibility('skip', false);
-    // changeVisibility('answer', false);
-    // changeVisibility('current-task', false);
-    // changeVisibility('timer', false);
-
-    // clearCanvasInteraction();
-    ctx.strokeStyle = 'hsl(0, 80%, 0%)';
 });
 
 socket.on('end game', (players) => {
     console.log('received end game');
-    
+
     setEndGameUi(players);
 });
